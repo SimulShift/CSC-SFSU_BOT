@@ -1,1 +1,3 @@
 env/
+*.pyc
+res/token.txt
