@@ -12,7 +12,6 @@ def main():
     #bot = Bot(tl.getToken())
 
     token = os.getenv('TOKEN')
-    print(token)
     bot = Bot(token)
 
 main()
