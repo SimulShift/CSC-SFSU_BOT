@@ -2,3 +2,4 @@ env/
 *.pyc
 res/token.txt
 .env
+*.swp

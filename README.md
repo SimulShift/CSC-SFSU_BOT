@@ -1,7 +1,6 @@
 ### Getting Started
 
-First you will need to get the token to run the bot.
-Ask Alex Pena for the secret token then place it
-in code.
+Create a .env file and place your secret token as
+TOKEN=value inside the .env file.
 
 To run the program simply `python3 bot.py`
