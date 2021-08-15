@@ -2,6 +2,7 @@
 import os
 
 class TokenLoader:
+    
     def __init__(self):
         self.TOKEN_FILE_NAME = "/res/token.txt"
 
