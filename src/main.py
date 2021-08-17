@@ -8,7 +8,7 @@ from Bot import Bot
 def main():
     load_dotenv() # load .env file
 
-    print('botenv: ', os.getenv('botenv'))
+    print('botenv: ', os.getenv('BOTENV'))
 
     token = os.getenv('TOKEN')
     bot = Bot(token)
