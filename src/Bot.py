@@ -29,14 +29,9 @@ class Bot(discord.Client):
         
     async def swag(self, message):
         isNotOurMessage = message.author.id != self.user.id
-        # this could all be made into a function
-        containsSwag = False
-
-        if "swag" in message.content:
-            containsSwag = True
 
         # if the incoming message wasnt sent by the bot
-        if isNotOurMessage and containsSwag:
+        if isNotOurMessage and "swag" in message.content:
                 senderID = message.author.id
 
                 if (senderID in self.profiles):
