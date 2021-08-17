@@ -22,24 +22,21 @@ class Bot(discord.Client):
 
         # the channel the message was sent in
         activeChannel = message.channel
+
+        await self.swag(message)
+        self.handleVulgarLanguage(message)
+
+        
+    async def swag(self, message):
         isNotOurMessage = message.author.id != self.user.id
-
         # this could all be made into a function
-        pottyLanguage = [
-            "swag"
-        ]
+        containsSwag = False
 
-        containsPotty = False
-
-        for pottyWord in pottyLanguage:
-            if pottyWord in message.content:
-                containsPotty = True
+        if "swag" in message.content:
+            containsSwag = True
 
         # if the incoming message wasnt sent by the bot
-        if (isNotOurMessage):
-
-            if (containsPotty):
-
+        if isNotOurMessage and containsSwag:
                 senderID = message.author.id
 
                 if (senderID in self.profiles):
@@ -47,10 +44,13 @@ class Bot(discord.Client):
                 else:
                     self.profiles[senderID] = UserProfile()     # else, create a profile for them
 
-                SWAG_FACTOR = 2
-                swagCounter = ":moneybag:"
+                swagEmoji = ":moneybag:"
 
                 for i in range(self.profiles[senderID].strikes):
-                    swagCounter *= 2
+                    swagEmoji *= 2
 
-                await message.channel.send(swagCounter)
+                await message.channel.send(swagEmoji)
+
+    def handleVulgarLanguage(self, message):
+        # do database stuff
+        vulgarLanguage = ['shit', 'fuck']
