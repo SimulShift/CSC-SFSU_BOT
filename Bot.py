@@ -2,9 +2,12 @@ from dotenv import load_dotenv
 from os import getenv
 import discord
 
-# if not installed run
 # $pip install "pymongo[srv]"
 from pymongo import MongoClient
+
+# $ pip install alt-profanity-check
+# $ pip install scikit-learn==0.20.2
+from better_profanity import profanity
 
 # load .env file
 load_dotenv() 
@@ -43,16 +46,25 @@ async def on_message(message):
         return
 
     # Check if this author has an account
-    account = db.accounts.find_one(author_id)
-
+    account = db.accounts.find_one({"user_id": author_id})
+    print(account)
     # If there is no account create one.
     if account is None:
         db.accounts.insert_one({
             "user_id":author_id,
-            "strikes":{},
-            "swag":0,
-        })
+            "strikes": {
+                f"{message.guild.id}":0,
+            },
+            "swag":0})
         print(f"Account created for {message.author.name}")
+
+    # Check for Profanity, this isnt a very good lib but I couln't get profanity-check to work.
+    if profanity.contains_profanity(message.content):
+        db.accounts.update_one(
+            {"user_id":author_id},
+            {"$inc": {f"strikes.{message.guild.id}":1}},
+            upsert=True
+        )
 
        
 #async def swag(message):
