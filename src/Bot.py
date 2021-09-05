@@ -68,7 +68,7 @@ async def check_profanity(message):
 async def add_member(member):
     db.accounts.insert_one(
         {
-            "user_id": member.ID,
+            "user_id": member.id,
             "strikes": {
                 f"{member.guild.id}": 0,
             },
@@ -85,8 +85,9 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
+    print(f"{member} sent a message")
     # When a user joins check if he has an account
-    account = db.accounts.find_one({"user_id": member.ID})
+    account = db.accounts.find_one({"user_id": member})
     # If there is no account create one.
     if account is None:
         add_member(member)
@@ -96,17 +97,19 @@ async def on_member_join(member):
 @bot.event
 async def on_message(message):
     await bot.process_commands(message)
-    author_id = message.author.id
+    author_id = message.author
 
     # Keep the bot from checking its own messages.
     if author_id is bot.user.id:
         return
 
     # Check if this author has an account
-    account = db.accounts.find_one({"user_id": author_id})
+    author_id_value = author_id.id
+    account = db.accounts.find_one({"user_id": author_id_value})
     # If there is no account create one.
     if account is None:
-        add_member(message.au)
+        print(f"{author_id} is a message author with no account, trying to add...")
+        await add_member(author_id)
 
     # check and handle if the message is profane.
     await check_profanity(message)
