@@ -4,21 +4,23 @@
 ### Dependencies
 
 ```
-pip install python-dotenv
-pip install "pymongo[srv]"
-pip install alt-profanity-check
-pip install scikit-learn==0.20.2
+python -m pip install discord.py python-dotenvpip "pymongo[srv]" alt-profanity-check
 ```
+
+
+### Make Bot Here
+
+https://discord.com/developers/applications
 
 ### Environment Variables
 
-Create a .env file and place your secret token as
+Create a .env file with the following environment variables
+in the following format `TOKEN=VALUE`
 
-DISCORD\_API\_TOKEN
-DB\_NAME
-DB\_PW
+DISCORD\_API\_TOKEN\
+DB\_NAME\
+DB\_PW\
 DB\_URL
-TOKEN=value inside the .env file.
 
 ### Running the bot
 
