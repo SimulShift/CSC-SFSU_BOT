@@ -100,7 +100,8 @@ async def on_message(message):
     author_id = message.author
 
     # Keep the bot from checking its own messages.
-    if author_id is bot.user.id:
+    if author_id.bot:
+        print(f"{author_id} sent a  message.")
         return
 
     # Check if this author has an account
