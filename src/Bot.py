@@ -29,7 +29,7 @@ db = db_client.discord
 
 # load the Bot
 print("Loading Bot")
-bot = Bot(intents=intents, command_prefix="$")
+bot = Bot(intents=intents, command_prefix="!")
 token = getenv("DISCORD_API_TOKEN")
 
 
@@ -126,6 +126,10 @@ async def on_message_edit(before, after):
 @bot.event
 async def on_disconnect():
     print(f"{bot.user} has been disconnected from discord")
+
+@bot.command()
+async def nullptr(ctx):
+    await ctx.channel.send("https://i.makeagif.com/media/9-29-2015/YwGqu_.gif")
 
 
 bot.run(token)
