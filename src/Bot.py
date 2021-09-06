@@ -96,12 +96,13 @@ async def on_member_join(member):
 # run on every message
 @bot.event
 async def on_message(message):
-    await bot.process_commands(message)
+    content = message.content
     author_id = message.author
-
+    print(f"{author_id} sent a message {content}")
+    await bot.process_commands(message)
     # Keep the bot from checking its own messages.
     if author_id.bot:
-        print(f"{author_id} sent a  message.")
+        print(f"{author_id} will not be checked for membership.")
         return
 
     # Check if this author has an account
@@ -114,7 +115,6 @@ async def on_message(message):
 
     # check and handle if the message is profane.
     await check_profanity(message)
-
 
 # check edited messages
 @bot.event
