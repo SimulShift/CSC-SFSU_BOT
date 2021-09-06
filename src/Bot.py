@@ -1,6 +1,8 @@
 from discord.enums import MessageType
 from dotenv import load_dotenv
 from os import getenv
+import random
+import time
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
@@ -103,6 +105,9 @@ async def on_message(message):
     # Keep the bot from checking its own messages.
     if author_id.bot:
         print(f"{author_id} will not be checked for membership.")
+        if content.find("🥱"):
+            await message.delete(delay=None)
+            await randumb(message)
         return
 
     # Check if this author has an account
@@ -131,5 +136,16 @@ async def on_disconnect():
 async def nullptr(ctx):
     await ctx.channel.send("https://i.makeagif.com/media/9-29-2015/YwGqu_.gif")
 
+@bot.command()
+async def randumb(ctx):
+    min = 1
+    max = 1000
+    await ctx.channel.send(f"Hmmm..")
+    sleepyMin = 1
+    sleepyMax = 5
+    if random.randint(1,10) >= 7:
+        await ctx.channel.send(f"🥱")
+        time.sleep({random.randint(float(sleepyMin,sleepyMax))})
+    await ctx.channel.send(f"Me choose...\n{random.randint(min,max)}\n")
 
 bot.run(token)
