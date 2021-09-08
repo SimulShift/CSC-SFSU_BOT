@@ -7,7 +7,9 @@ import time
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
+import hashlib
 
+from Support.App import MyClass
 intents = Intents.all()
 
 # $pip install "pymongo[srv]"
@@ -34,7 +36,20 @@ db = db_client.discord
 print("Loading Bot")
 bot = Bot(intents=intents, command_prefix="!")
 token = getenv("DISCORD_API_TOKEN")
+current = MyClass(hashlib.sha256())
 
+def turn():
+    turn = db.accounts.find({"turn_id":1})
+    print(f"turn:\n{turn}\n")
+    if turn is None:
+        current.turn = hashlib.sha256()
+        db.accounts.find_one_and_update({"turn_id":current.turn})
+    return db.accounts.find({"turn_id":1}) == current.turn
+
+@bot.command()
+async def broadcast_turn(ctx):
+    current.prev_turn = current.turn
+    await ctx.channel.send(f"Turn: \n{current.turn.hexdigest()}\n")
 
 async def strike(member):
     db.accounts.update_one(
@@ -101,18 +116,18 @@ async def on_member_join(member):
 async def on_message(message):
     content = message.content
     author_id = message.author
+    author_id_value = author_id.id
     print(f"{author_id} sent a message {content}")
     await bot.process_commands(message)
     # Keep the bot from checking its own messages.
     if author_id.bot:
-        print(f"{author_id} will not be checked for membership.")
+        print(f"{author_id} with id {author_id_value} will not be checked for membership.")
         if content.find("🥱"):
             await message.delete(delay=None)
             await randumb(message)
         return
 
     # Check if this author has an account
-    author_id_value = author_id.id
     account = db.accounts.find_one({"user_id": author_id_value})
     # If there is no account create one.
     if account is None:
@@ -139,24 +154,33 @@ async def nullptr(ctx):
 
 @bot.command()
 async def randumb(ctx):
-    await ctx.channel.send("https://www.google.com/url?sa=i&url=https%3A%2F%2Fgiphy.com%2Fexplore%2Fjohn-cena-super-saiyan&psig=AOvVaw26prbbR2ZEMU01FY1ni0Z6&ust=1630996185234000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCMjJjLTc6fICFQAAAAAdAAAAABAD")
     min = 1
     max = 1000
     await ctx.channel.send(f"Hmmm..")
     sleepyMin = 1
     sleepyMax = 45
     if random.randint(1,10) >= 7:
-        await ctx.channel.send(f"🥱\nhttps://giphy.com/gifs/funny-john-cena-super-saiyan-Vzku9jyuef09G\n")
-        time.sleep({random.randint(float(sleepyMin,sleepyMax))})
-    randumb_choice = random.randint(min,max)
-    randumb_universe = random.randint(min,max)
-    await ctx.channel.send(f"Me choose...\n{random.randint(min,max)}\n")
-    if randumb_universe > randumb_choice:
-        await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n I lost to Universe 👿\n FUCK")
-    elif randumb_universe == randumb_choice:
-        await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n It's a draw with the Universe 😎\n")
+        await ctx.channel.send(f"🥱")
+        time.sleep({random.randint(float(sleepyMin,sleepyMax)*.1)})
+        current.turn = hashlib.sha256()
+        print({f"Owner:\n{bot.owner_id}\nwoke up with previous turn id:\n{current.prev_turn.hexdigest()}\nand current turn id :\n{current.turn.hexdigest()}\n"})
     else:
-        await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n I beat the Universe 👿\n")
-    await ctx.channel.send(f"Universe choose...\n{random.randint(min,max)}\n")
+        randumb_choice = random.randint(min,max)
+        randumb_universe = random.randint(min,max)
+        await ctx.channel.send(f"Me choose...\n{random.randint(min,max)}\n")
+        if randumb_universe > randumb_choice:
+            await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n I lost to Universe 👿\n")
+        elif randumb_universe == randumb_choice:
+            await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n It's a draw with the Universe 😎\n")
+        else:
+            await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n I beat the Universe 👿\n")
+            await nullptr(ctx)
+            time.sleep(float(10))
+    while not turn:
+        time.sleep({random.randint(float(sleepyMin,sleepyMax)*.1)})
+        current.prev_turn = current.turn
+        current.turn = None
+        broadcast_turn
+    await ctx.channel.send(f"Ready\n")
 
 bot.run(token)
