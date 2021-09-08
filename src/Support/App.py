@@ -4,6 +4,7 @@ class App:
     prev_turn = ""
     def __init__(self, turn):
         self.turn = turn
+        self.prev_turn = turn
     
     def addMessage(self, message):
         self.received.append(message)

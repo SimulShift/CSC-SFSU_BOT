@@ -8,7 +8,7 @@ import discord
 from discord.ext.commands import Bot
 from discord import Intents
 import hashlib
-
+import threading
 from Support.App import MyClass
 intents = Intents.all()
 
@@ -37,13 +37,16 @@ print("Loading Bot")
 bot = Bot(intents=intents, command_prefix="!")
 token = getenv("DISCORD_API_TOKEN")
 current = MyClass(hashlib.sha256())
+sema = threading.Semaphore
 
 def turn():
+    sema.acquire
     turn = db.accounts.find({"turn_id":1})
     print(f"turn:\n{turn}\n")
     if turn is None:
         current.turn = hashlib.sha256()
         db.accounts.find_one_and_update({"turn_id":current.turn})
+    sema.release
     return db.accounts.find({"turn_id":1}) == current.turn
 
 @bot.command()
@@ -117,14 +120,19 @@ async def on_message(message):
     content = message.content
     author_id = message.author
     author_id_value = author_id.id
+    turn_id = current.turn.hexdigest()
     print(f"{author_id} sent a message {content}")
     await bot.process_commands(message)
     # Keep the bot from checking its own messages.
     if author_id.bot:
         print(f"{author_id} with id {author_id_value} will not be checked for membership.")
-        if content.find("🥱"):
-            await message.delete(delay=None)
-            await randumb(message)
+        if turn_id in content:
+            print(f"Found:\n{turn_id}\n in content:\n{content}\n")
+            return
+        else:
+            if content.find("🥱"):
+                if not turn:
+                    await message.delete(delay=None)
         return
 
     # Check if this author has an account
@@ -161,8 +169,7 @@ async def randumb(ctx):
     sleepyMax = 45
     if random.randint(1,10) >= 7:
         await ctx.channel.send(f"🥱")
-        time.sleep({random.randint(float(sleepyMin,sleepyMax)*.1)})
-        current.turn = hashlib.sha256()
+        time.sleep(random.randint(1, 5))
         print({f"Owner:\n{bot.owner_id}\nwoke up with previous turn id:\n{current.prev_turn.hexdigest()}\nand current turn id :\n{current.turn.hexdigest()}\n"})
     else:
         randumb_choice = random.randint(min,max)
@@ -175,12 +182,11 @@ async def randumb(ctx):
         else:
             await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n I beat the Universe 👿\n")
             await nullptr(ctx)
-            time.sleep(float(10))
     while not turn:
-        time.sleep({random.randint(float(sleepyMin,sleepyMax)*.1)})
+        time.sleep(random.randint(1, 5))
         current.prev_turn = current.turn
         current.turn = None
         broadcast_turn
-    await ctx.channel.send(f"Ready\n")
+    await ctx.channel.send(f"Ready\n{current.turn.hexdigest()}\n")
 
 bot.run(token)
