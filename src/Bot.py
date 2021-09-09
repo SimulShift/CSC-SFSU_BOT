@@ -46,6 +46,7 @@ def turn():
     if current.prev_turn is None:
         current.turn = hashlib.sha256()
         db.accounts.find_one_and_update({"turn_id":current.turn})
+    current.prev_turn = None
     sema.release
     return db.accounts.find({"turn_id":1}) == current.turn
 
@@ -129,11 +130,11 @@ async def on_message(message):
         if turn_id in content:
             print(f"Found:\n{turn_id}\n in content:\n{content}\n")
             sema.acquire
-            db.accounts.find_one_and_update({"turn_id":hashlib.sha256()})
+            db.accounts.find_one_and_delete({"turn_id":1})
             sema.release
             return
         else:
-            await broadcast_turn()
+            turn()
         return
 
     # Check if this author has an account
@@ -163,15 +164,14 @@ async def nullptr(ctx):
 
 @bot.command()
 async def randumb(ctx):
-    sema.acquire
     await ctx.channel.send(f"I might sleep...")
     if random.randint(1,10) >= 7:
         await ctx.channel.send(f"I am asleep 🥱")
         time.sleep(random.randint(1, 5))
-        print({f"Owner:\n{bot.owner_id}\nwoke up with previous turn id:\n{current.prev_turn.hexdigest()}\nand current turn id :\n{current.turn.hexdigest()}\n"})
+        #print({f"Owner:\n{bot.owner_id}\nwoke up with previous turn id:\n{current.prev_turn.hexdigest()}\nand current turn id :\n{current.turn.hexdigest()}\n"})
 
     while not turn:
         time.sleep(random.randint(1, 5))
+    current.turn = hashlib.sha256()
     await ctx.channel.send(f"Ready\n{current.turn.hexdigest()}\n")
-    sema.release
 bot.run(token)
