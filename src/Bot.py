@@ -128,6 +128,9 @@ async def on_message(message):
         print(f"{author_id} with id {author_id_value} will not be checked for membership.")
         if turn_id in content:
             print(f"Found:\n{turn_id}\n in content:\n{content}\n")
+            sema.acquire
+            db.accounts.find_one_and_update({"turn_id":hashlib.sha256()})
+            sema.release
             return
         else:
             await broadcast_turn()
