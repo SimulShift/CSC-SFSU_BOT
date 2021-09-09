@@ -41,9 +41,9 @@ sema = threading.Semaphore
 
 def turn():
     sema.acquire
-    turn = db.accounts.find({"turn_id":1})
+    current.prev_turn = db.accounts.find({"turn_id":1})
     print(f"turn:\n{turn}\n")
-    if turn is None:
+    if current.prev_turn is None:
         current.turn = hashlib.sha256()
         db.accounts.find_one_and_update({"turn_id":current.turn})
     sema.release
@@ -51,8 +51,8 @@ def turn():
 
 @bot.command()
 async def broadcast_turn(ctx):
-    current.prev_turn = current.turn
-    await ctx.channel.send(f"Turn: \n{current.turn.hexdigest()}\n")
+    await ctx.channel.send(f"Current context:\n{ctx}\n")
+    await ctx.channel.send(f"Current Turn: \n{current.turn.hexdigest()}\nPrevious Turn:\n{current.prev_turn.hexdigest()}\n")
 
 async def strike(member):
     db.accounts.update_one(
@@ -130,9 +130,7 @@ async def on_message(message):
             print(f"Found:\n{turn_id}\n in content:\n{content}\n")
             return
         else:
-            if content.find("🥱"):
-                if not turn:
-                    await message.delete(delay=None)
+            await broadcast_turn()
         return
 
     # Check if this author has an account
@@ -162,31 +160,15 @@ async def nullptr(ctx):
 
 @bot.command()
 async def randumb(ctx):
-    min = 1
-    max = 1000
-    await ctx.channel.send(f"Hmmm..")
-    sleepyMin = 1
-    sleepyMax = 45
+    sema.acquire
+    await ctx.channel.send(f"I might sleep...")
     if random.randint(1,10) >= 7:
-        await ctx.channel.send(f"🥱")
+        await ctx.channel.send(f"I am asleep 🥱")
         time.sleep(random.randint(1, 5))
         print({f"Owner:\n{bot.owner_id}\nwoke up with previous turn id:\n{current.prev_turn.hexdigest()}\nand current turn id :\n{current.turn.hexdigest()}\n"})
-    else:
-        randumb_choice = random.randint(min,max)
-        randumb_universe = random.randint(min,max)
-        await ctx.channel.send(f"Me choose...\n{random.randint(min,max)}\n")
-        if randumb_universe > randumb_choice:
-            await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n I lost to Universe 👿\n")
-        elif randumb_universe == randumb_choice:
-            await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n It's a draw with the Universe 😎\n")
-        else:
-            await ctx.channel.send(f"Universe choose: \n{random.randint(min,max)}\n I beat the Universe 👿\n")
-            await nullptr(ctx)
+
     while not turn:
         time.sleep(random.randint(1, 5))
-        current.prev_turn = current.turn
-        current.turn = None
-        broadcast_turn
     await ctx.channel.send(f"Ready\n{current.turn.hexdigest()}\n")
-
+    sema.release
 bot.run(token)
