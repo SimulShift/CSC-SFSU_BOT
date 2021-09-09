@@ -22,6 +22,8 @@ def classSearch(searchString):
     print(data["aaData"][0][2])
 
     for entity in data["aaData"]:
+        classID = entity[0].split('>')[1].split('<')[0]
+        classType = entity[1]
         classTitle = entity[2]
         classUnits = entity[3]
         classNumber = entity[4]
@@ -35,16 +37,22 @@ def classSearch(searchString):
         classLocation = dateLine[8].split('<')[0]
 
         # Need to strip the HTML out of the line storing the professors name as well
-        classProfessor = entity[8].split('>')[1].split('<')[0]
+        classProfessor = entity[8].split('>')[1].split('<')[0].strip()
 
 
         classSeats = entity[9]
         classWaitlist = entity[10]
 
-        print(  f"Title: {classTitle}\n"\
+        print(  f"Course: {classID}\n"\
+                f"Type:   {classType}\n"\
+                f"Title:  {classTitle}\n"\
+                f"Units:  {classUnits}\n"\
                 f"Number: {classNumber}\n"\
-                f"ClassTime: {classTime}\n"\
-                f"Professor: {classProfessor}"
+                f"Time:   {classDay} {classTime}\n"\
+                f"Date:   {classDate}\n"\
+                f"Room:   {classLocation}\n"\
+                f"Prof:   {classProfessor}\n"\
+                f"Seats:  {classSeats}\tWaitlist: {classWaitlist}"
             )
         print("-----------------------------------------------------------------------------------------")
 
