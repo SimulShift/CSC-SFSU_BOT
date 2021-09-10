@@ -4,6 +4,7 @@ from os import getenv
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
+from ClassSearch import quickSearch
 
 intents = Intents.all()
 
@@ -130,6 +131,27 @@ async def on_disconnect():
 @bot.command()
 async def nullptr(ctx):
     await ctx.channel.send("https://i.makeagif.com/media/9-29-2015/YwGqu_.gif")
+
+@bot.command()
+async def cs(ctx, arg):
+    await classsearch(ctx, arg)
+
+@bot.command()
+async def classsearch(ctx, arg):
+    # Send an inital message here
+    await ctx.channel.send(f"Searching for {arg}")
+
+    # Edit the mes
+    results = await quickSearch(arg)
+    if results == "":
+        await ctx.channel.send(f"No results {arg}")
+    else:
+        message = '```'
+        for c in results:
+            message += (f'{c["CourseNumber"]} {c["Professor"]:<15} {c["Time"]} {c["Days"]} {c["Location"]}\n')
+        message += '```'
+        await ctx.channel.send(message)
+        
 
 
 bot.run(token)
