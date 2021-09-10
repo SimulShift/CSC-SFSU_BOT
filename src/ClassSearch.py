@@ -1,4 +1,5 @@
 import json
+from typing_extensions import TypeAlias
 import mechanize
 from enum import Enum
 
@@ -12,8 +13,21 @@ class Classes(Enum):
     CSC510 = "CSC510"
     CSC600 = "CSC600"
 
-class ClassSearch:
+class ClassSearchResults(Enum):
+    COURSE = "Course"
+    TYPE = "Type"
+    TITLE = "Title"
+    UNITS = "Units"
+    NUMBER = "Number"
+    DAY = "Day"
+    TIME = "Time"
+    DATE = "Date"
+    ROOM = "Room"
+    PROFESSOR = "Professor"
+    SEATS = "Seats"
+    WAITLIST = "Waitlist"
 
+class ClassSearch:
     def __init__(self):
     
         def classSearch(self, searchString):
@@ -56,16 +70,16 @@ class ClassSearch:
                 classSeats = entity[9]
                 classWaitlist = entity[10]
 
-                return [{"Course":classID,
-                        "Type":classType,
-                        "Title":classTitle,
-                        "Units":classUnits,
-                        "Number":classNumber,
-                        "Day":classDay,
-                        "Time":classTime,
-                        "Date":classDate,
-                        "Room":classLocation,
-                        "Prof":classProfessor,
-                        "Seats":classSeats,
-                        "Waitlist":classWaitlist}]
+                return [{ClassSearchResults.TIME:classID,
+                        ClassSearchResults.TYPE:classType,
+                        ClassSearchResults.TITLE:classTitle,
+                        ClassSearchResults.UNITS:classUnits,
+                        ClassSearchResults.NUMBER:classNumber,
+                        ClassSearchResults.DAY:classDay,
+                        ClassSearchResults.TIME:classTime,
+                        ClassSearchResults.DATE:classDate,
+                        ClassSearchResults.ROOM:classLocation,
+                        ClassSearchResults.PROFESSOR:classProfessor,
+                        ClassSearchResults.SEATS:classSeats,
+                        ClassSearchResults.WAITLIST:classWaitlist}]
                 
