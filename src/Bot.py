@@ -4,8 +4,8 @@ from os import getenv
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
-import ClassSearch
-
+from ClassSearch import ClassSearch
+from ClassSearch import Classes
 intents = Intents.all()
 
 # $pip install "pymongo[srv]"
@@ -32,7 +32,6 @@ db = db_client.discord
 print("Loading Bot")
 bot = Bot(intents=intents, command_prefix="!")
 token = getenv("DISCORD_API_TOKEN")
-
 
 async def strike(member):
     db.accounts.update_one(
@@ -134,8 +133,16 @@ async def nullptr(ctx):
 
 @bot.command()
 async def search_class(ctx, class_to_search):
-    await ctx.channel.send("Searching for: {class_to_search}\n")
-    result = ClassSearch().classSearch(search_class=class_to_search)
-    await ctx.channel.send("Found:\n{result}\n")
+    searching = ''
+    
+    if class_to_search.find("256"):
+        searching = Classes.CSC256
+    search(searching)
+    await ctx.channel.send(f"Searching for: \n{class_to_search}\n")
+
+def search(search:str):
+    result = ClassSearch()
+    result.classSearch(searchString=search)
+    print(f"result:\n{result}\n")
 
 bot.run(token)

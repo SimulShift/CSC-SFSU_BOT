@@ -3,40 +3,40 @@ import mechanize
 from enum import Enum
 
 class Classes(Enum):
-    CSC210 = "CSC210"
-    CSC220 = "CSC220"
-    CSC256 = "CSC256"
-    CSC340 = "CSC340"
-    CSC413 = "CSC413"
-    CSC415 = "CSC415"
-    CSC510 = "CSC510"
-    CSC600 = "CSC600"
+    CSC210: str = "CSC210"
+    CSC220: str = "CSC220"
+    CSC256: str = "CSC256"
+    CSC340: str = "CSC340"
+    CSC413: str = "CSC413"
+    CSC415: str = "CSC415"
+    CSC510: str = "CSC510"
+    CSC600: str = "CSC600"
 
 class ClassSearchResultsKeys(Enum):
-    COURSE = "Course"
-    TYPE = "Type"
-    TITLE = "Title"
-    UNITS = "Units"
-    NUMBER = "Number"
-    DAY = "Day"
-    TIME = "Time"
-    DATE = "Date"
-    ROOM = "Room"
+    COURSE: str = "Course"
+    TYPE: str = "Type"
+    TITLE: str = "Title"
+    UNITS: str = "Units"
+    NUMBER: str = "Number"
+    DAY: str = "Day"
+    TIME: str = "Time"
+    DATE: str = "Date"
+    ROOM: str = "Room"
     PROFESSOR = "Professor"
-    SEATS = "Seats"
-    WAITLIST = "Waitlist"
+    SEATS: str = "Seats"
+    WAITLIST: str = "Waitlist"
 
 class ClassSearchPage:
 
         class ClassServicesResultsPageURL(Enum):
-            CLASS_SEARCH_JSON_RESULTS_URL = "https://webapps.sfsu.edu/public/classservices/searchresultsjson"
+            CLASS_SEARCH_JSON_RESULTS_URL: str = "https://webapps.sfsu.edu/public/classservices/searchresultsjson"
 
         class ClassSearchPageURL(Enum):
-            CLASS_SEARCH_URL = "https://webapps.sfsu.edu/public/classservices/classsearch"
+            CLASS_SEARCH_URL: str = "https://webapps.sfsu.edu/public/classservices/classsearch"
 
         class ClassSearchPageForms(Enum):
-            CLASS_SCHEDULE_QUICK_FORM = "classScheduleQuick"
-            CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR = "classScheduleQuick[searchFor]"
+            CLASS_SCHEDULE_QUICK_FORM: str = "classScheduleQuick"
+            CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR: str = "classScheduleQuick[searchFor]"
 
         def __init__(self) -> None:
             pass
