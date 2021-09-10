@@ -4,6 +4,7 @@ from os import getenv
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
+import ClassSearch
 
 intents = Intents.all()
 
@@ -131,5 +132,10 @@ async def on_disconnect():
 async def nullptr(ctx):
     await ctx.channel.send("https://i.makeagif.com/media/9-29-2015/YwGqu_.gif")
 
+@bot.command()
+async def search_class(ctx, class_to_search):
+    await ctx.channel.send("Searching for: {class_to_search}\n")
+    result = ClassSearch().classSearch(search_class=class_to_search)
+    await ctx.channel.send("Found:\n{result}\n")
 
 bot.run(token)

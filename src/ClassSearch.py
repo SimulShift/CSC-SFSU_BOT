@@ -1,8 +1,7 @@
 import json
-from typing_extensions import TypeAlias
 import mechanize
 from enum import Enum
-import struct
+
 class Classes(Enum):
     CSC210 = "CSC210"
     CSC220 = "CSC220"
@@ -29,34 +28,70 @@ class ClassSearchResultsKeys(Enum):
 
 class ClassSearchPage:
 
+        class ClassServicesResultsPageURL(Enum):
+            CLASS_SEARCH_JSON_RESULTS_URL = "https://webapps.sfsu.edu/public/classservices/searchresultsjson"
+
         class ClassSearchPageURL(Enum):
             CLASS_SEARCH_URL = "https://webapps.sfsu.edu/public/classservices/classsearch"
 
         class ClassSearchPageForms(Enum):
             CLASS_SCHEDULE_QUICK_FORM = "classScheduleQuick"
+            CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR = "classScheduleQuick[searchFor]"
 
         def __init__(self) -> None:
             pass
 
+class MechanizeWebBrowser:
+    class Headers(Enum):
+        USER_AGENT = "User-agent"
+        FIREFOX = "Firefox"
+    
+    browser: mechanize.Browser
+    def __init__(self) -> None:
+        self.browser = mechanize.Browser()
+
+    def set_handle_robots(self, enabled: bool):
+        self.browser.set_handle_robots(enabled)
+
+    def set_handle_refresh(self, enabled: bool):
+        self.browser.set_handle_refresh(enabled)
+
+    def set_headers_user_agent_and_firefox(self):
+        self.browser.addheaders = [(self.Headers.USER_AGENT, self.Headers.FIREFOX)]
+
+    def open_url(self, url: str):
+        self.browser.open(url)
+    
+    def select_html_form(self, form: str):
+        self.browser.select_form(form)
+    
+    def find_html_form_control(self, form: str):
+        self.browser.form.find_control(form)
 
 class ClassSearch:
     page: ClassSearchPage
+    browser: MechanizeWebBrowser
+
     def __init__(self):
         self.page = ClassSearchPage()
+        self.browser = MechanizeWebBrowser().browser
+        
     def classSearch(self, searchString):
-        br = mechanize.Browser()
-        br.set_handle_robots(False)   # ignore robots
-        br.set_handle_refresh(False)  # can sometimes hang without this
+        self.browser = MechanizeWebBrowser()
+        self.browser.set_handle_robots(enabled=False) # ignore robots
+        self.browser.set_handle_refresh(enabled=False) # can sometimes hang without this
 
-        br.addheaders = [('User-agent', 'Firefox')]
+        self.browser.set_headers_user_agent_and_firefox()
 
-        br.open(self.page.ClassSearchPageURL.CLASS_SEARCH_URL)
-        br.select_form(self.page.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM)
+        self.browser.open_url(self.page.ClassSearchPageURL.CLASS_SEARCH_URL)
 
+        self.browser.select_html_form(self.page.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM)
 
-        br.form.find_control("classScheduleQuick[searchFor]").value = searchString
-        br.submit()
-        result = br.open("https://webapps.sfsu.edu/public/classservices/searchresultsjson")
+        self.browser.form.find_control(self.page.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR).value = searchString
+
+        self.browser.submit()
+
+        result = self.browser.open(self.page.ClassServicesResultsPageURL.CLASS_SEARCH_JSON_RESULTS_URL)
         data = json.loads(result.read())
 
         print(data["aaData"][0][2])
