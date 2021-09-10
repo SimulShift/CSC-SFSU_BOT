@@ -16,7 +16,7 @@ class ClassSearch:
 
     def __init__(self):
     
-        def classSearch(self,searchString):
+        def classSearch(self, searchString):
             br = mechanize.Browser()
             br.set_handle_robots(False)   # ignore robots
             br.set_handle_refresh(False)  # can sometimes hang without this
@@ -56,18 +56,16 @@ class ClassSearch:
                 classSeats = entity[9]
                 classWaitlist = entity[10]
 
-                print(  f"Course: {classID}\n"\
-                        f"Type:   {classType}\n"\
-                        f"Title:  {classTitle}\n"\
-                        f"Units:  {classUnits}\n"\
-                        f"Number: {classNumber}\n"\
-                        f"Time:   {classDay} {classTime}\n"\
-                        f"Date:   {classDate}\n"\
-                        f"Room:   {classLocation}\n"\
-                        f"Prof:   {classProfessor}\n"\
-                        f"Seats:  {classSeats}\tWaitlist: {classWaitlist}"
-                    )
-                print("-----------------------------------------------------------------------------------------")
-
-
-classSearch("CSC256")
+                return [{"Course":classID,
+                        "Type":classType,
+                        "Title":classTitle,
+                        "Units":classUnits,
+                        "Number":classNumber,
+                        "Day":classDay,
+                        "Time":classTime,
+                        "Date":classDate,
+                        "Room":classLocation,
+                        "Prof":classProfessor,
+                        "Seats":classSeats,
+                        "Waitlist":classWaitlist}]
+                
