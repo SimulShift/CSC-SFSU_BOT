@@ -39,7 +39,6 @@ async def quickSearch(searchString):
     br.form.find_control("classScheduleQuick[searchFor]").value = searchString
     br.submit()
     result = br.open("https://webapps.sfsu.edu/public/classservices/searchresultsjson")
-    print(result[:20])
     if result == "":
         raise Exception("Class not Found")
 

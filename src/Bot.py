@@ -154,7 +154,8 @@ async def classsearch(ctx, arg):
         return
        
     text = "```"
-    for c in results:
+
+    for c in results[:15]:
         # You can modify the lay out of the table by changing the numbers. 
         # The first number limits the size and the second one pads it with 
         # spaces to make a nice table
@@ -166,8 +167,7 @@ async def classsearch(ctx, arg):
                 f'{c["Location"]}\n'
 
     text += "```"
-    await message.edit(content=text)
-    await message.add_reaction()
+    await message.edit(content=text, delete_after=90)
 
 
 bot.run(token)
