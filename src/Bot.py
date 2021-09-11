@@ -1,13 +1,14 @@
+import threading
 from discord.enums import MessageType
 from dotenv import load_dotenv
 from os import getenv
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
-from ClassSearch import ClassSearchResultsKeys, quickSearch
-
+from ClassSearch import ClassSearchResultsKeys, advancedSearch, quickSearch
+from threading import Thread
 intents = Intents.all()
-
+sema = threading.Semaphore
 # $pip install "pymongo[srv]"
 from pymongo import MongoClient
 
@@ -150,5 +151,18 @@ async def classsearch(ctx, arg):
             message += (f'{c[ClassSearchResultsKeys.COURSE.value]} {c[ClassSearchResultsKeys.PROFESSOR.value]:<15} {c[ClassSearchResultsKeys.TIME.value]} {c[ClassSearchResultsKeys.DAY.value]} {c[ClassSearchResultsKeys.LOCATION.value]}\n')
         message += '```'
         await ctx.channel.send(message)
+@bot.command()
+async def class_search_more(ctx, arg):
+    for results in await advancedSearch(arg):
+        sema.acquire
+        while len(results) <= 1500:
+            message = '```'
+            message += (f'{results[ClassSearchResultsKeys.COURSE.value]} {results[ClassSearchResultsKeys.PROFESSOR.value]:<15} {results[ClassSearchResultsKeys.TIME.value]} {results[ClassSearchResultsKeys.DAY.value]} {results[ClassSearchResultsKeys.LOCATION.value]}\n')
+            message += '```'
+            await ctx.channel.send(message)
+            message = ''
+            break
+        sema.release
+    
 
 bot.run(token)
