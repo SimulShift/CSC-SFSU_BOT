@@ -172,3 +172,17 @@ async def classsearch(ctx, arg):
     await message.edit(content=text, delete_after=120)
 
 bot.run(token)
+
+@bot.command()
+async def class_search_more(ctx, arg):
+    for results in await advancedSearch(arg):
+        sema.acquire
+        while len(results) <= 1500:
+            message = '```'
+            message += (f'{results[ClassSearchResultsKeys.COURSE.value]} {results[ClassSearchResultsKeys.PROFESSOR.value]:<15} {results[ClassSearchResultsKeys.TIME.value]} {results[ClassSearchResultsKeys.DAY.value]} {results[ClassSearchResultsKeys.LOCATION.value]}\n')
+            message += '```'
+            await ctx.channel.send(message)
+            message = ''
+            break
+        sema.release
+
