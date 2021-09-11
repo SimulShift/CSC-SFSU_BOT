@@ -162,16 +162,14 @@ async def classsearch(ctx, arg):
         # You can modify the lay out of the table by changing the numbers. 
         # The first number limits the size and the second one pads it with 
         # spaces to make a nice table
-        text += f'{c[ClassSearchResultsKeys.COURSE.value][:13]:2} | '\
-                f'{c[ClassSearchResultsKeys.PROFESSOR.value][:19]:2} | '\
-                f'{c[ClassSearchResultsKeys.DAY.value][:10]:2} | '\
-                f'{c[ClassSearchResultsKeys.TIME.value][:20]:2} | '\
+        text += f'{c[ClassSearchResultsKeys.COURSE.value][:12]:<10} | '\
+                f'{c[ClassSearchResultsKeys.PROFESSOR.value][:15]:<15} | '\
+                f'{c[ClassSearchResultsKeys.DAY.value]} | '\
+                f'{c[ClassSearchResultsKeys.TIME.value]:<18} | '\
                 f'{c[ClassSearchResultsKeys.LOCATION.value]}\n'
 
     text += "```"
     await message.edit(content=text, delete_after=120)
-
-bot.run(token)
 
 @bot.command()
 async def class_search_more(ctx, arg):
@@ -185,4 +183,6 @@ async def class_search_more(ctx, arg):
             message = ''
             break
         sema.release
+
+bot.run(token)
 
