@@ -142,6 +142,7 @@ async def cs(ctx, arg):
 
 @bot.command()
 async def classsearch(ctx, arg):
+    await ctx.message.delete(delay=1)
     # Send an inital message here
     message = await ctx.channel.send(f"Searching for {arg} . . .", delete_after=120)
 
@@ -152,8 +153,10 @@ async def classsearch(ctx, arg):
         print(e)
         await message.edit(content=f"No results for {arg}", delete_after=30)
         return
-       
-    text = "```"
+           
+    if len(results) > 15 : 
+        text = "*too many results, printing the first 15 \n```" 
+    else: text = "```"
 
     for c in results[:15]:
         # You can modify the lay out of the table by changing the numbers. 
@@ -167,7 +170,7 @@ async def classsearch(ctx, arg):
                 f'{c["Location"]}\n'
 
     text += "```"
-    await message.edit(content=text, delete_after=90)
+    await message.edit(content=text, delete_after=120)
 
 
 bot.run(token)
