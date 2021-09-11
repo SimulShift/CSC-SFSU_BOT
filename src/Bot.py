@@ -1,13 +1,14 @@
+import threading
 from discord.enums import MessageType
 from dotenv import load_dotenv
 from os import getenv
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
-from ClassSearch import quickSearch
-
+from ClassSearch import ClassSearchResultsKeys, advancedSearch, quickSearch
+from threading import Thread
 intents = Intents.all()
-
+sema = threading.Semaphore
 # $pip install "pymongo[srv]"
 from pymongo import MongoClient
 
@@ -32,7 +33,6 @@ db = db_client.discord
 print("Loading Bot")
 bot = Bot(intents=intents, command_prefix="!")
 token = getenv("DISCORD_API_TOKEN")
-
 
 async def strike(member):
     db.accounts.update_one(
@@ -171,6 +171,5 @@ async def classsearch(ctx, arg):
 
     text += "```"
     await message.edit(content=text, delete_after=120)
-
 
 bot.run(token)

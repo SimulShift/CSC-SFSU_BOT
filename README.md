@@ -4,13 +4,16 @@
 ### Dependencies
 
 ```
-python -m pip install discord.py python-dotenvpip "pymongo[srv]" alt-profanity-check
+python -m pip install discord.py python-dotenvpip "pymongo[srv]" alt-profanity-check mechanize
 ```
-
 
 ### Make Bot Here
 
 https://discord.com/developers/applications
+
+### Link to invite to server
+
+https://discord.com/api/oauth2/authorize?client_id=<applicationid>&permissions=8192&scope=bot%20applications.commands
 
 ### Environment Variables
 
