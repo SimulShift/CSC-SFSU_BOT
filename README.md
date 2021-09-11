@@ -20,6 +20,7 @@ https://discord.com/api/oauth2/authorize?client_id=<applicationid>&permissions=8
 Create a .env file with the following environment variables
 in the following format `TOKEN=VALUE`
 
+BOT\_ENV
 DISCORD\_API\_TOKEN\
 DB\_NAME\
 DB\_PW\

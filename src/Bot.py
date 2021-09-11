@@ -162,14 +162,27 @@ async def classsearch(ctx, arg):
         # You can modify the lay out of the table by changing the numbers. 
         # The first number limits the size and the second one pads it with 
         # spaces to make a nice table
-        text += f'{c["CourseNumber"][:13]:15}'\
-                f'{c["Days"][:10]:12}'\
-                f'{c["Time"][:20]:22}'\
-                f'{c["Professor"][:19]:21}'\
-                f'{c["Dates"][:25]:27}'\
-                f'{c["Location"]}\n'
+        text += f'{c[ClassSearchResultsKeys.COURSE.value][:12]:<10} | '\
+                f'{c[ClassSearchResultsKeys.PROFESSOR.value][:15]:<15} | '\
+                f'{c[ClassSearchResultsKeys.DAY.value]} | '\
+                f'{c[ClassSearchResultsKeys.TIME.value]:<18} | '\
+                f'{c[ClassSearchResultsKeys.LOCATION.value]}\n'
 
     text += "```"
     await message.edit(content=text, delete_after=120)
 
+@bot.command()
+async def class_search_more(ctx, arg):
+    for results in await advancedSearch(arg):
+        sema.acquire
+        while len(results) <= 1500:
+            message = '```'
+            message += (f'{results[ClassSearchResultsKeys.COURSE.value]} {results[ClassSearchResultsKeys.PROFESSOR.value]:<15} {results[ClassSearchResultsKeys.TIME.value]} {results[ClassSearchResultsKeys.DAY.value]} {results[ClassSearchResultsKeys.LOCATION.value]}\n')
+            message += '```'
+            await ctx.channel.send(message)
+            message = ''
+            break
+        sema.release
+
 bot.run(token)
+
