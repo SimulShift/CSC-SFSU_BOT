@@ -1,4 +1,5 @@
 import json
+from logging import exception
 import mechanize
 import asyncio
 
@@ -6,7 +7,7 @@ async def quickSearch(searchString):
     """
     :param searchString: the class to seach for, the database expects a classnumber
 
-    :yields: dicts with the following schema
+    :returns: dicts with the following schema
         [   
             {
                 CourseNumber: "CSC210[1]"
@@ -38,6 +39,9 @@ async def quickSearch(searchString):
     br.form.find_control("classScheduleQuick[searchFor]").value = searchString
     br.submit()
     result = br.open("https://webapps.sfsu.edu/public/classservices/searchresultsjson")
+    print(result[:20])
+    if result == "":
+        raise Exception("Class not Found")
 
     data = json.loads(result.read())
     classList = []
@@ -82,7 +86,7 @@ async def quickSearch(searchString):
             "Seats":seats,
             "Waitlist":waitlist
         })
-        
+
     return classList
 
 async def main():
