@@ -162,12 +162,11 @@ async def classsearch(ctx, arg):
         # You can modify the lay out of the table by changing the numbers. 
         # The first number limits the size and the second one pads it with 
         # spaces to make a nice table
-        text += f'{c["CourseNumber"][:13]:15}'\
-                f'{c["Days"][:10]:12}'\
-                f'{c["Time"][:20]:22}'\
-                f'{c["Professor"][:19]:21}'\
-                f'{c["Dates"][:25]:27}'\
-                f'{c["Location"]}\n'
+        text += f'{c[ClassSearchResultsKeys.COURSE.value][:13]:2} | '\
+                f'{c[ClassSearchResultsKeys.PROFESSOR.value][:19]:2} | '\
+                f'{c[ClassSearchResultsKeys.DAY.value][:10]:2} | '\
+                f'{c[ClassSearchResultsKeys.TIME.value][:20]:2} | '\
+                f'{c[ClassSearchResultsKeys.LOCATION.value]}\n'
 
     text += "```"
     await message.edit(content=text, delete_after=120)
