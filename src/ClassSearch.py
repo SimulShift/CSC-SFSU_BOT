@@ -1,6 +1,31 @@
 import json
 import mechanize
 import asyncio
+from enum import Enum
+
+class Classes(Enum):
+    CSC210 = "CSC210"
+    CSC220 = "CSC220"
+    CSC256 = "CSC256"
+    CSC340 = "CSC340"
+    CSC413 = "CSC413"
+    CSC415 = "CSC415"
+    CSC510 = "CSC510"
+    CSC600 = "CSC600"
+
+class ClassSearchResultsKeys(Enum):
+    COURSE = "Course"
+    TYPE = "Type"
+    TITLE = "Title"
+    UNITS = "Units"
+    NUMBER = "Number"
+    DAY = "Day"
+    TIME = "Time"
+    DATE = "Date"
+    LOCATION = "Location"
+    PROFESSOR = "Professor"
+    SEATS = "Seats"
+    WAITLIST = "Waitlist"
 
 async def quickSearch(searchString):
     """
@@ -31,13 +56,13 @@ async def quickSearch(searchString):
 
     br.addheaders = [('User-agent', 'Firefox')]
 
-    br.open("https://webapps.sfsu.edu/public/classservices/classsearch")
-    br.select_form("classScheduleQuick")
+    br.open(ClassSearchPage.ClassSearchPageURL.CLASS_SEARCH_URL.value)
+    br.select_form(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM.value)
 
 
-    br.form.find_control("classScheduleQuick[searchFor]").value = searchString
+    br.form.find_control(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR.value).value = searchString
     br.submit()
-    result = br.open("https://webapps.sfsu.edu/public/classservices/searchresultsjson")
+    result = br.open(ClassSearchPage.ClassServicesResultsPageURL.CLASS_SEARCH_JSON_RESULTS_URL.value)
 
     data = json.loads(result.read())
     classList = []
@@ -69,24 +94,36 @@ async def quickSearch(searchString):
         waitlist = entity[10]
 
         classList.append({
-            "CourseNumber":courseNumber,
-            "Type":type,
-            "Title":title,
-            "Units":units,
-            "ClassNumber":classNumber,
-            "Days":days,
-            "Time":time,
-            "Dates":dates,
-            "Location":location,
-            "Professor":professor,
-            "Seats":seats,
-            "Waitlist":waitlist
+            ClassSearchResultsKeys.COURSE.value:courseNumber,
+            ClassSearchResultsKeys.TYPE.value:type,
+            ClassSearchResultsKeys.TITLE.value:title,
+            ClassSearchResultsKeys.UNITS.value:units,
+            ClassSearchResultsKeys.NUMBER.value:classNumber,
+            ClassSearchResultsKeys.DAY.value:days,
+            ClassSearchResultsKeys.TIME.value:time,
+            ClassSearchResultsKeys.DATE.value:dates,
+            ClassSearchResultsKeys.LOCATION.value:location,
+            ClassSearchResultsKeys.PROFESSOR.value:professor,
+            ClassSearchResultsKeys.SEATS.value:seats,
+            ClassSearchResultsKeys.WAITLIST.value:waitlist
         })
         
     return classList
 
+class ClassSearchPage:
+
+        class ClassServicesResultsPageURL(Enum):
+            CLASS_SEARCH_JSON_RESULTS_URL = "https://webapps.sfsu.edu/public/classservices/searchresultsjson"
+
+        class ClassSearchPageURL(Enum):
+            CLASS_SEARCH_URL = "https://webapps.sfsu.edu/public/classservices/classsearch"
+
+        class ClassSearchPageForms(Enum):
+            CLASS_SCHEDULE_QUICK_FORM = "classScheduleQuick"
+            CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR = "classScheduleQuick[searchFor]"
+
 async def main():
-    classes = await quickSearch("CSC210")
+    classes = await quickSearch(Classes.CSC340.value)
     for c in classes:
         print(c)
 

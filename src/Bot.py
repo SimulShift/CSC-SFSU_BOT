@@ -4,7 +4,7 @@ from os import getenv
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
-from ClassSearch import quickSearch
+from ClassSearch import ClassSearchResultsKeys, quickSearch
 
 intents = Intents.all()
 
@@ -32,7 +32,6 @@ db = db_client.discord
 print("Loading Bot")
 bot = Bot(intents=intents, command_prefix="!")
 token = getenv("DISCORD_API_TOKEN")
-
 
 async def strike(member):
     db.accounts.update_one(
@@ -148,10 +147,8 @@ async def classsearch(ctx, arg):
     else:
         message = '```'
         for c in results:
-            message += (f'{c["CourseNumber"]} {c["Professor"]:<15} {c["Time"]} {c["Days"]} {c["Location"]}\n')
+            message += (f'{c[ClassSearchResultsKeys.COURSE.value]} {c[ClassSearchResultsKeys.PROFESSOR.value]:<15} {c[ClassSearchResultsKeys.TIME.value]} {c[ClassSearchResultsKeys.DAY.value]} {c[ClassSearchResultsKeys.LOCATION.value]}\n')
         message += '```'
         await ctx.channel.send(message)
-        
-
 
 bot.run(token)
