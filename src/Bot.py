@@ -4,8 +4,8 @@ from os import getenv
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
-from ClassSearch import ClassSearch
-from ClassSearch import Classes
+from ClassSearch import ClassSearchResultsKeys, quickSearch
+
 intents = Intents.all()
 
 # $pip install "pymongo[srv]"
@@ -132,17 +132,23 @@ async def nullptr(ctx):
     await ctx.channel.send("https://i.makeagif.com/media/9-29-2015/YwGqu_.gif")
 
 @bot.command()
-async def search_class(ctx, class_to_search):
-    searching = ''
-    
-    if class_to_search.find("256"):
-        searching = Classes.CSC256
-    search(searching)
-    await ctx.channel.send(f"Searching for: \n{class_to_search}\n")
+async def cs(ctx, arg):
+    await classsearch(ctx, arg)
 
-def search(search:str):
-    result = ClassSearch()
-    result.classSearch(searchString=search)
-    print(f"result:\n{result}\n")
+@bot.command()
+async def classsearch(ctx, arg):
+    # Send an inital message here
+    await ctx.channel.send(f"Searching for {arg}")
+
+    # Edit the mes
+    results = await quickSearch(arg)
+    if results == "":
+        await ctx.channel.send(f"No results {arg}")
+    else:
+        message = '```'
+        for c in results:
+            message += (f'{c[ClassSearchResultsKeys.COURSE.value]} {c[ClassSearchResultsKeys.PROFESSOR.value]:<15} {c[ClassSearchResultsKeys.TIME.value]} {c[ClassSearchResultsKeys.DAY.value]} {c[ClassSearchResultsKeys.LOCATION.value]}\n')
+        message += '```'
+        await ctx.channel.send(message)
 
 bot.run(token)

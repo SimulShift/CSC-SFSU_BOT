@@ -1,133 +1,131 @@
 import json
 import mechanize
+import asyncio
 from enum import Enum
 
 class Classes(Enum):
-    CSC210: str = "CSC210"
-    CSC220: str = "CSC220"
-    CSC256: str = "CSC256"
-    CSC340: str = "CSC340"
-    CSC413: str = "CSC413"
-    CSC415: str = "CSC415"
-    CSC510: str = "CSC510"
-    CSC600: str = "CSC600"
+    CSC210 = "CSC210"
+    CSC220 = "CSC220"
+    CSC256 = "CSC256"
+    CSC340 = "CSC340"
+    CSC413 = "CSC413"
+    CSC415 = "CSC415"
+    CSC510 = "CSC510"
+    CSC600 = "CSC600"
 
 class ClassSearchResultsKeys(Enum):
-    COURSE: str = "Course"
-    TYPE: str = "Type"
-    TITLE: str = "Title"
-    UNITS: str = "Units"
-    NUMBER: str = "Number"
-    DAY: str = "Day"
-    TIME: str = "Time"
-    DATE: str = "Date"
-    ROOM: str = "Room"
+    COURSE = "Course"
+    TYPE = "Type"
+    TITLE = "Title"
+    UNITS = "Units"
+    NUMBER = "Number"
+    DAY = "Day"
+    TIME = "Time"
+    DATE = "Date"
+    LOCATION = "Location"
     PROFESSOR = "Professor"
-    SEATS: str = "Seats"
-    WAITLIST: str = "Waitlist"
+    SEATS = "Seats"
+    WAITLIST = "Waitlist"
+
+async def quickSearch(searchString):
+    """
+    :param searchString: the class to seach for, the database expects a classnumber
+
+    :yields: dicts with the following schema
+        [   
+            {
+                CourseNumber: "CSC210[1]"
+                Type: "LEC" # Either LEC or LAB I belive
+                Title: "Introduction to Computer Programming"  
+                Units: "3"
+                ClassNumber: "1908"
+                Attributes: "Lower Division"
+                Days: "Tu Th"
+                Time: "12:30PM - 1:45PM"
+                Date: "23-AUG-2021 - 10-DEC-2021"
+                Location: "Online Synchronous" # This field is blank if the class does not have a room assigned yet
+                Instructor: "Arno Puder"
+                Seats: "0"
+                Waitlist "5"
+            }
+        ]
+    """
+    br = mechanize.Browser()
+    br.set_handle_robots(False)   # ignore robots
+    br.set_handle_refresh(False)  # can sometimes hang without this
+
+    br.addheaders = [('User-agent', 'Firefox')]
+
+    br.open(ClassSearchPage.ClassSearchPageURL.CLASS_SEARCH_URL.value)
+    br.select_form(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM.value)
+
+
+    br.form.find_control(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR.value).value = searchString
+    br.submit()
+    result = br.open(ClassSearchPage.ClassServicesResultsPageURL.CLASS_SEARCH_JSON_RESULTS_URL.value)
+
+    data = json.loads(result.read())
+    classList = []
+
+    for entity in data["aaData"]:
+        classes = []
+        courseNumber = entity[0].split('>')[1].split('<')[0]
+        type = entity[1]
+        title = entity[2]
+        units = entity[3]
+        classNumber = entity[4]
+
+        # Need to do some string parsing to get information out of line 7
+        dateLine = entity[7]
+        dateLine = dateLine.split('>')
+        days = dateLine[2].split('<')[0]
+        time = dateLine[4].split('<')[0]
+        dates = dateLine[6].split('<')[0]
+        
+        # Not gurenteed to have a location
+        try:
+            location = dateLine[8].split('<')[0]
+        except:
+            location = ""
+
+        # Need to strip the HTML out of the line storing the professors name as well
+        professor = entity[8].split('>')[1].split('<')[0].strip()
+        seats = entity[9]
+        waitlist = entity[10]
+
+        classList.append({
+            ClassSearchResultsKeys.COURSE.value:courseNumber,
+            ClassSearchResultsKeys.TYPE.value:type,
+            ClassSearchResultsKeys.TITLE.value:title,
+            ClassSearchResultsKeys.UNITS.value:units,
+            ClassSearchResultsKeys.NUMBER.value:classNumber,
+            ClassSearchResultsKeys.DAY.value:days,
+            ClassSearchResultsKeys.TIME.value:time,
+            ClassSearchResultsKeys.DATE.value:dates,
+            ClassSearchResultsKeys.LOCATION.value:location,
+            ClassSearchResultsKeys.PROFESSOR.value:professor,
+            ClassSearchResultsKeys.SEATS.value:seats,
+            ClassSearchResultsKeys.WAITLIST.value:waitlist
+        })
+        
+    return classList
 
 class ClassSearchPage:
 
         class ClassServicesResultsPageURL(Enum):
-            CLASS_SEARCH_JSON_RESULTS_URL: str = "https://webapps.sfsu.edu/public/classservices/searchresultsjson"
+            CLASS_SEARCH_JSON_RESULTS_URL = "https://webapps.sfsu.edu/public/classservices/searchresultsjson"
 
         class ClassSearchPageURL(Enum):
-            CLASS_SEARCH_URL: str = "https://webapps.sfsu.edu/public/classservices/classsearch"
+            CLASS_SEARCH_URL = "https://webapps.sfsu.edu/public/classservices/classsearch"
 
         class ClassSearchPageForms(Enum):
-            CLASS_SCHEDULE_QUICK_FORM: str = "classScheduleQuick"
-            CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR: str = "classScheduleQuick[searchFor]"
+            CLASS_SCHEDULE_QUICK_FORM = "classScheduleQuick"
+            CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR = "classScheduleQuick[searchFor]"
 
-        def __init__(self) -> None:
-            pass
+async def main():
+    classes = await quickSearch(Classes.CSC340.value)
+    for c in classes:
+        print(c)
 
-class MechanizeWebBrowser:
-    class Headers(Enum):
-        USER_AGENT = "User-agent"
-        FIREFOX = "Firefox"
-    
-    browser: mechanize.Browser
-    def __init__(self) -> None:
-        self.browser = mechanize.Browser()
-
-    def set_handle_robots(self, enabled: bool):
-        self.browser.set_handle_robots(enabled)
-
-    def set_handle_refresh(self, enabled: bool):
-        self.browser.set_handle_refresh(enabled)
-
-    def set_headers_user_agent_and_firefox(self):
-        self.browser.addheaders = [(self.Headers.USER_AGENT, self.Headers.FIREFOX)]
-
-    def open_url(self, url: str):
-        self.browser.open(url)
-    
-    def select_html_form(self, form: str):
-        self.browser.select_form(form)
-    
-    def find_html_form_control(self, form: str):
-        self.browser.form.find_control(form)
-
-class ClassSearch:
-    page: ClassSearchPage
-    browser: MechanizeWebBrowser
-
-    def __init__(self):
-        self.page = ClassSearchPage()
-        self.browser = MechanizeWebBrowser().browser
-        
-    def classSearch(self, searchString):
-        self.browser = MechanizeWebBrowser()
-        self.browser.set_handle_robots(enabled=False) # ignore robots
-        self.browser.set_handle_refresh(enabled=False) # can sometimes hang without this
-
-        self.browser.set_headers_user_agent_and_firefox()
-
-        self.browser.open_url(self.page.ClassSearchPageURL.CLASS_SEARCH_URL)
-
-        self.browser.select_html_form(self.page.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM)
-
-        self.browser.form.find_control(self.page.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR).value = searchString
-
-        self.browser.submit()
-
-        result = self.browser.open(self.page.ClassServicesResultsPageURL.CLASS_SEARCH_JSON_RESULTS_URL)
-        data = json.loads(result.read())
-
-        print(data["aaData"][0][2])
-
-        for entity in data["aaData"]:
-            classID = entity[0].split('>')[1].split('<')[0]
-            classType = entity[1]
-            classTitle = entity[2]
-            classUnits = entity[3]
-            classNumber = entity[4]
-
-            # Need to do some string parsing to get information out of line 7
-            dateLine = entity[7]
-            dateLine = dateLine.split('>')
-            classDay = dateLine[2].split('<')[0]
-            classTime = dateLine[4].split('<')[0]
-            classDate = dateLine[6].split('<')[0]
-            classLocation = dateLine[8].split('<')[0]
-
-            # Need to strip the HTML out of the line storing the professors name as well
-            classProfessor = entity[8].split('>')[1].split('<')[0].strip()
-
-
-            classSeats = entity[9]
-            classWaitlist = entity[10]
-
-            return [{ClassSearchResultsKeys.TIME:classID,
-                        ClassSearchResultsKeys.TYPE:classType,
-                        ClassSearchResultsKeys.TITLE:classTitle,
-                        ClassSearchResultsKeys.UNITS:classUnits,
-                        ClassSearchResultsKeys.NUMBER:classNumber,
-                        ClassSearchResultsKeys.DAY:classDay,
-                        ClassSearchResultsKeys.TIME:classTime,
-                        ClassSearchResultsKeys.DATE:classDate,
-                        ClassSearchResultsKeys.ROOM:classLocation,
-                        ClassSearchResultsKeys.PROFESSOR:classProfessor,
-                        ClassSearchResultsKeys.SEATS:classSeats,
-                        ClassSearchResultsKeys.WAITLIST:classWaitlist}]
-                
+if __name__ == '__main__':
+    asyncio.get_event_loop().run_until_complete(main())
