@@ -1,4 +1,5 @@
 import json
+from logging import exception
 import mechanize
 import asyncio
 from enum import Enum
@@ -92,7 +93,7 @@ async def quickSearch(searchString):
     """
     :param searchString: the class to seach for, the database expects a classnumber
 
-    :yields: dicts with the following schema
+    :returns: dicts with the following schema
         [   
             {
                 CourseNumber: "CSC210[1]"
@@ -124,6 +125,8 @@ async def quickSearch(searchString):
     br.form.find_control(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR.value).value = searchString
     br.submit()
     result = br.open(ClassSearchPage.ClassServicesResultsPageURL.CLASS_SEARCH_JSON_RESULTS_URL.value)
+    if result == "":
+        raise Exception("Class not Found")
 
     data = json.loads(result.read())
     classList = []
@@ -168,7 +171,7 @@ async def quickSearch(searchString):
             ClassSearchResultsKeys.SEATS.value:seats,
             ClassSearchResultsKeys.WAITLIST.value:waitlist
         })
-        
+
     return classList
 
 class ClassSearchPage:
