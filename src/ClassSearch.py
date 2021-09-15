@@ -43,12 +43,37 @@ async def advancedSearch(searchString):
     br.form.find_control(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR.value).value = searchString
     br.submit()
     result = br.open(ClassSearchPage.ClassServicesResultsPageURL.CLASS_SEARCH_JSON_RESULTS_URL.value)
-
     data = json.loads(result.read())
     classList = []
-    print(f"\n{data}\n")
+    #print(f"\n{data}\n")
+    parsed = []
+    for unparsedClassResult in data["aaData"]:
+        #print(f"unparsed class result:\n{unparsedClassResult}\n")
+        for character in unparsedClassResult:
+            delimit = ''
+            if character == "<":
+                delimit += ">"
+            if character == ">":
+                delimit += "<"
+            currentIndex = unparsedClassResult.index(character)
+            nextIndex = currentIndex+1
+            removeSubstring = ''
+            while not unparsedClassResult[nextIndex] == (delimit):
+                unparsedClassResult[nextIndex] == ''
+                removeSubstring += unparsedClassResult[nextIndex]
+                nextIndex = nextIndex + 1
+            #print(f"found:\n{removeSubstring}\n")
+            parsed.append(removeSubstring)
+            removeSubstring = ''
+            
+    for parse in parsed:
+        print(f"\n{parse}\n")
+    
+    
+
     for entity in data["aaData"]:
-        classes = []
+        if entity[0].find('>') or entity[0].find('<'):
+            classes = []
         courseNumber = entity[0].split('>')[1].split('<')[0]
         type = entity[1]
         title = entity[2]
@@ -187,7 +212,7 @@ class ClassSearchPage:
             CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR = "classScheduleQuick[searchFor]"
 
 async def main():
-    classes = await quickSearch("101")
+    classes = await advancedSearch("101")
     for c in classes:
         print(c)
 
