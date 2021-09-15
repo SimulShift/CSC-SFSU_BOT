@@ -45,75 +45,57 @@ async def advancedSearch(searchString):
     result = br.open(ClassSearchPage.ClassServicesResultsPageURL.CLASS_SEARCH_JSON_RESULTS_URL.value)
     data = json.loads(result.read())
     classList = []
-    #print(f"\n{data}\n")
-    parsed = []
-    for unparsedClassResult in data["aaData"]:
-        #print(f"unparsed class result:\n{unparsedClassResult}\n")
-        for character in unparsedClassResult:
-            delimit = ''
-            if character == "<":
-                delimit += ">"
-            if character == ">":
-                delimit += "<"
-            currentIndex = unparsedClassResult.index(character)
-            nextIndex = currentIndex+1
-            removeSubstring = ''
-            while not unparsedClassResult[nextIndex] == (delimit):
-                unparsedClassResult[nextIndex] == ''
-                removeSubstring += unparsedClassResult[nextIndex]
-                nextIndex = nextIndex + 1
-            #print(f"found:\n{removeSubstring}\n")
-            parsed.append(removeSubstring)
-            removeSubstring = ''
-            
-    for parse in parsed:
-        print(f"\n{parse}\n")
-    
-    
 
+    
     for entity in data["aaData"]:
         if entity[0].find('>') or entity[0].find('<'):
             classes = []
-        courseNumber = entity[0].split('>')[1].split('<')[0]
-        type = entity[1]
-        title = entity[2]
-        units = entity[3]
-        classNumber = entity[4]
+            courseNumber = entity[0].split('>')[1].split('<')[0]
+            type = entity[1]
+            title = entity[2]
+            units = entity[3]
+            classNumber = entity[4]
 
         # Need to do some string parsing to get information out of line 7
-        dateLine = entity[7]
-        dateLine = dateLine.split('>')
-        days = dateLine[2].split('<')[0]
-        time = dateLine[4].split('<')[0]
-        dates = dateLine[6].split('<')[0]
+            try:
+                dateLine = entity[7]
+                dateLine = dateLine.split('>')
+                days = dateLine[2].split('<')[0]
+                time = dateLine[4].split('<')[0]
+                dates = dateLine[6].split('<')[0]
+            except:
+                dateLine = ""
+                days = ""
+                time = ""
+                dates = ""
         
         # Not gurenteed to have a location
-        try:
-            location = dateLine[8].split('<')[0]
-        except:
-            location = ""
+            try:
+                location = dateLine[8].split('<')[0]
+            except:
+                location = ""
 
         # Need to strip the HTML out of the line storing the professors name as well
-        professor = entity[8].split('>')[1].split('<')[0].strip()
-        seats = entity[9]
-        waitlist = entity[10]
+            professor = entity[8].split('>')[1].split('<')[0].strip()
+            seats = entity[9]
+            waitlist = entity[10]
 
-        classList.append({
-            ClassSearchResultsKeys.COURSE.value:courseNumber,
-            ClassSearchResultsKeys.TYPE.value:type,
-            ClassSearchResultsKeys.TITLE.value:title,
-            ClassSearchResultsKeys.UNITS.value:units,
-            ClassSearchResultsKeys.NUMBER.value:classNumber,
-            ClassSearchResultsKeys.DAY.value:days,
-            ClassSearchResultsKeys.TIME.value:time,
-            ClassSearchResultsKeys.DATE.value:dates,
-            ClassSearchResultsKeys.LOCATION.value:location,
-            ClassSearchResultsKeys.PROFESSOR.value:professor,
-            ClassSearchResultsKeys.SEATS.value:seats,
-            ClassSearchResultsKeys.WAITLIST.value:waitlist
-        })
-        
+            classList.append({
+                ClassSearchResultsKeys.COURSE.value:courseNumber,
+                ClassSearchResultsKeys.TYPE.value:type,
+                ClassSearchResultsKeys.TITLE.value:title,
+                ClassSearchResultsKeys.UNITS.value:units,
+                ClassSearchResultsKeys.NUMBER.value:classNumber,
+                ClassSearchResultsKeys.DAY.value:days,
+                ClassSearchResultsKeys.TIME.value:time,
+                ClassSearchResultsKeys.DATE.value:dates,
+                ClassSearchResultsKeys.LOCATION.value:location,
+                ClassSearchResultsKeys.PROFESSOR.value:professor,
+                ClassSearchResultsKeys.SEATS.value:seats,
+                ClassSearchResultsKeys.WAITLIST.value:waitlist
+            })
     return classList
+
 async def quickSearch(searchString):
     """
     :param searchString: the class to seach for, the database expects a classnumber
