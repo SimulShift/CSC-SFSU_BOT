@@ -1,94 +1,10 @@
 import json
-from logging import exception
 import mechanize
 import asyncio
-from enum import Enum
-
-class Classes(Enum):
-    CSC210 = "CSC210"
-    CSC220 = "CSC220"
-    CSC256 = "CSC256"
-    CSC340 = "CSC340"
-    CSC413 = "CSC413"
-    CSC415 = "CSC415"
-    CSC510 = "CSC510"
-    CSC600 = "CSC600"
-
-class ClassSearchResultsKeys(Enum):
-    COURSE = "Course"
-    TYPE = "Type"
-    TITLE = "Title"
-    UNITS = "Units"
-    NUMBER = "Number"
-    DAY = "Day"
-    TIME = "Time"
-    DATE = "Date"
-    LOCATION = "Location"
-    PROFESSOR = "Professor"
-    SEATS = "Seats"
-    WAITLIST = "Waitlist"
-
-async def advancedSearch(searchString):
-    
-    br = mechanize.Browser()
-    br.set_handle_robots(False)   # ignore robots
-    br.set_handle_refresh(False)  # can sometimes hang without this
-
-    br.addheaders = [('User-agent', 'Firefox')]
-
-    br.open(ClassSearchPage.ClassSearchPageURL.CLASS_SEARCH_URL.value)
-    br.select_form(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM.value)
+from bs4 import BeautifulSoup
 
 
-    br.form.find_control(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR.value).value = searchString
-    br.submit()
-    result = br.open(ClassSearchPage.ClassServicesResultsPageURL.CLASS_SEARCH_JSON_RESULTS_URL.value)
 
-    data = json.loads(result.read())
-    classList = []
-    print(f"\n{data}\n")
-    for entity in data["aaData"]:
-        classes = []
-        courseNumber = entity[0].split('>')[1].split('<')[0]
-        type = entity[1]
-        title = entity[2]
-        units = entity[3]
-        classNumber = entity[4]
-
-        # Need to do some string parsing to get information out of line 7
-        dateLine = entity[7]
-        dateLine = dateLine.split('>')
-        days = dateLine[2].split('<')[0]
-        time = dateLine[4].split('<')[0]
-        dates = dateLine[6].split('<')[0]
-        
-        # Not gurenteed to have a location
-        try:
-            location = dateLine[8].split('<')[0]
-        except:
-            location = ""
-
-        # Need to strip the HTML out of the line storing the professors name as well
-        professor = entity[8].split('>')[1].split('<')[0].strip()
-        seats = entity[9]
-        waitlist = entity[10]
-
-        classList.append({
-            ClassSearchResultsKeys.COURSE.value:courseNumber,
-            ClassSearchResultsKeys.TYPE.value:type,
-            ClassSearchResultsKeys.TITLE.value:title,
-            ClassSearchResultsKeys.UNITS.value:units,
-            ClassSearchResultsKeys.NUMBER.value:classNumber,
-            ClassSearchResultsKeys.DAY.value:days,
-            ClassSearchResultsKeys.TIME.value:time,
-            ClassSearchResultsKeys.DATE.value:dates,
-            ClassSearchResultsKeys.LOCATION.value:location,
-            ClassSearchResultsKeys.PROFESSOR.value:professor,
-            ClassSearchResultsKeys.SEATS.value:seats,
-            ClassSearchResultsKeys.WAITLIST.value:waitlist
-        })
-        
-    return classList
 async def quickSearch(searchString):
     """
     :param searchString: the class to seach for, the database expects a classnumber
@@ -101,7 +17,6 @@ async def quickSearch(searchString):
                 Title: "Introduction to Computer Programming"  
                 Units: "3"
                 ClassNumber: "1908"
-                Attributes: "Lower Division"
                 Days: "Tu Th"
                 Time: "12:30PM - 1:45PM"
                 Date: "23-AUG-2021 - 10-DEC-2021"
@@ -112,27 +27,36 @@ async def quickSearch(searchString):
             }
         ]
     """
+    url = "https://webapps.sfsu.edu/public/classservices/classsearch"
+    formName = "classScheduleQuick"
+    searchFieldName = "classScheduleQuick[searchFor]"
+    jsonResultsUrl = "https://webapps.sfsu.edu/public/classservices/searchresultsjson"
+
+    # Create a virtual browswer instance
     br = mechanize.Browser()
     br.set_handle_robots(False)   # ignore robots
     br.set_handle_refresh(False)  # can sometimes hang without this
-
     br.addheaders = [('User-agent', 'Firefox')]
 
-    br.open(ClassSearchPage.ClassSearchPageURL.CLASS_SEARCH_URL.value)
-    br.select_form(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM.value)
+    # Navagate to the page with the form and select the form
+    br.open(url)
+    br.select_form(formName)
 
-
-    br.form.find_control(ClassSearchPage.ClassSearchPageForms.CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR.value).value = searchString
+    # Fill out the form, we are only using 1 field at the moment but the form also has fields to select a semester.
+    br.form.find_control(searchFieldName).value = searchString
     br.submit()
-    result = br.open(ClassSearchPage.ClassServicesResultsPageURL.CLASS_SEARCH_JSON_RESULTS_URL.value)
+    result = br.open(jsonResultsUrl)
+
+    # TODO: Test if this always works.
     if result == "":
         raise Exception("Class not Found")
 
+    #
     data = json.loads(result.read())
     classList = []
-    print(f"\n{data}\n")
+
+    # for some reason all the data is nested inside of a field named aaData
     for entity in data["aaData"]:
-        classes = []
         courseNumber = entity[0].split('>')[1].split('<')[0]
         type = entity[1]
         title = entity[2]
@@ -140,17 +64,28 @@ async def quickSearch(searchString):
         classNumber = entity[4]
 
         # Need to do some string parsing to get information out of line 7
-        dateLine = entity[7]
-        dateLine = dateLine.split('>')
-        days = dateLine[2].split('<')[0]
-        time = dateLine[4].split('<')[0]
-        dates = dateLine[6].split('<')[0]
+        dateLine = BeautifulSoup(entity[7], 'html.parser').div.contents
+        if len(dateLine) == 2:
+            days = dateLine[0].text
+            time = "TBD or ONLINE"
+            dates = dateLine[1].text
+            location = "TBD"
+        elif len(dateLine) == 3:
+            days = dateLine[0].text
+            time = "TBD or ONLINE"
+            dates = dateLine[1].text
+            location = dateLine[2].text
+        elif len(dateLine) == 4:
+            days = dateLine[0].text
+            time = dateLine[1].text
+            dates = dateLine[2].text
+            location = dateLine[3].text
+        else:
+            days = ""
+            time = "TBD or ONLINE"
+            dates = ""
+            location = "TBD"
         
-        # Not gurenteed to have a location
-        try:
-            location = dateLine[8].split('<')[0]
-        except:
-            location = ""
 
         # Need to strip the HTML out of the line storing the professors name as well
         professor = entity[8].split('>')[1].split('<')[0].strip()
@@ -158,36 +93,25 @@ async def quickSearch(searchString):
         waitlist = entity[10]
 
         classList.append({
-            ClassSearchResultsKeys.COURSE.value:courseNumber,
-            ClassSearchResultsKeys.TYPE.value:type,
-            ClassSearchResultsKeys.TITLE.value:title,
-            ClassSearchResultsKeys.UNITS.value:units,
-            ClassSearchResultsKeys.NUMBER.value:classNumber,
-            ClassSearchResultsKeys.DAY.value:days,
-            ClassSearchResultsKeys.TIME.value:time,
-            ClassSearchResultsKeys.DATE.value:dates,
-            ClassSearchResultsKeys.LOCATION.value:location,
-            ClassSearchResultsKeys.PROFESSOR.value:professor,
-            ClassSearchResultsKeys.SEATS.value:seats,
-            ClassSearchResultsKeys.WAITLIST.value:waitlist
+            "CourseNumber":courseNumber,                         
+            "Type":type,
+            "Title":title,
+            "Units":units,
+            "ClassNumber":classNumber,
+            "Days":days,
+            "Time":time,
+            "Dates":dates,
+            "Location":location,
+            "Professor":professor,
+            "Seats":seats,
+            "Waitlist":waitlist,
         })
 
     return classList
 
-class ClassSearchPage:
-
-        class ClassServicesResultsPageURL(Enum):
-            CLASS_SEARCH_JSON_RESULTS_URL = "https://webapps.sfsu.edu/public/classservices/searchresultsjson"
-
-        class ClassSearchPageURL(Enum):
-            CLASS_SEARCH_URL = "https://webapps.sfsu.edu/public/classservices/classsearch"
-
-        class ClassSearchPageForms(Enum):
-            CLASS_SCHEDULE_QUICK_FORM = "classScheduleQuick"
-            CLASS_SCHEDULE_QUICK_FORM_SEARCH_FOR = "classScheduleQuick[searchFor]"
 
 async def main():
-    classes = await quickSearch("101")
+    classes = await quickSearch("210")
     for c in classes:
         print(c)
 

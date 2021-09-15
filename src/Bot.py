@@ -1,14 +1,13 @@
-import threading
 from discord.enums import MessageType
 from dotenv import load_dotenv
 from os import getenv
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
-from ClassSearch import ClassSearchResultsKeys, advancedSearch, quickSearch
-from threading import Thread
+from ClassSearch import quickSearch
+
 intents = Intents.all()
-sema = threading.Semaphore
+
 # $pip install "pymongo[srv]"
 from pymongo import MongoClient
 
