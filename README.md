@@ -4,7 +4,7 @@
 ### Dependencies
 
 ```
-python -m pip install discord.py python-dotenvpip "pymongo[srv]" alt-profanity-check mechanize
+python -m pip install discord.py python-dotenvpip "pymongo[srv]" alt-profanity-check mechanize beautifulsoup4
 ```
 
 ### Make Bot Here
