@@ -28,6 +28,12 @@ class ClassSearchResultsKeys(Enum):
     SEATS = "Seats"
     WAITLIST = "Waitlist"
 
+class ClassSearchDelimiters(Enum):
+    OPEN = '<'
+    CLOSE = '>'
+
+class ClassSearchJSONDataKeys(Enum):
+    ROOTDATAKEY = "aaData"
 def search(searchString):
         
     br = mechanize.Browser()
@@ -49,9 +55,9 @@ def search(searchString):
 async def advancedSearch(searchString):
     data = search(searchString=searchString)
     classList = []
-    for entity in data["aaData"]:
-        if entity[0].find('>') or entity[0].find('<'):
-            courseNumber = entity[0].split('>')[1].split('<')[0]
+    for entity in data[ClassSearchJSONDataKeys.ROOTDATAKEY.value]:
+        if entity[0].find(ClassSearchDelimiters.CLOSE.value) or entity[0].find(ClassSearchDelimiters.OPEN.value):
+            courseNumber = entity[0].split(ClassSearchDelimiters.CLOSE.value)[1].split(ClassSearchDelimiters.OPEN.value)[0]
             type = entity[1]
             title = entity[2]
             units = entity[3]
@@ -60,10 +66,10 @@ async def advancedSearch(searchString):
         # Need to do some string parsing to get information out of line 7
             try:
                 dateLine = entity[7]
-                dateLine = dateLine.split('>')
-                days = dateLine[2].split('<')[0]
-                time = dateLine[4].split('<')[0]
-                dates = dateLine[6].split('<')[0]
+                dateLine = dateLine.split(ClassSearchDelimiters.CLOSE.value)
+                days = dateLine[2].split(ClassSearchDelimiters.OPEN.value)[0]
+                time = dateLine[4].split(ClassSearchDelimiters.OPEN.value)[0]
+                dates = dateLine[6].split(ClassSearchDelimiters.OPEN.value)[0]
             except:
                 dateLine = ""
                 days = ""
@@ -72,12 +78,12 @@ async def advancedSearch(searchString):
         
         # Not gurenteed to have a location
             try:
-                location = dateLine[8].split('<')[0]
+                location = dateLine[8].split(ClassSearchDelimiters.OPEN.value)[0]
             except:
                 location = ""
 
         # Need to strip the HTML out of the line storing the professors name as well
-            professor = entity[8].split('>')[1].split('<')[0].strip()
+            professor = entity[8].split(ClassSearchDelimiters.CLOSE.value)[1].split(ClassSearchDelimiters.OPEN.value)[0].strip()
             seats = entity[9]
             waitlist = entity[10]
 
@@ -122,9 +128,9 @@ async def quickSearch(searchString):
     """
     data = search(searchString=searchString)
     classList = []
-    for entity in data["aaData"]:
-        if entity[0].find('>') or entity[0].find('<'):
-            courseNumber = entity[0].split('>')[1].split('<')[0]
+    for entity in data[ClassSearchJSONDataKeys.ROOTDATAKEY.value]:
+        if entity[0].find(ClassSearchDelimiters.CLOSE.value) or entity[0].find(ClassSearchDelimiters.OPEN.value):
+            courseNumber = entity[0].split(ClassSearchDelimiters.CLOSE.value)[1].split(ClassSearchDelimiters.OPEN.value)[0]
             type = entity[1]
             title = entity[2]
             units = entity[3]
@@ -133,10 +139,10 @@ async def quickSearch(searchString):
         # Need to do some string parsing to get information out of line 7
             try:
                 dateLine = entity[7]
-                dateLine = dateLine.split('>')
-                days = dateLine[2].split('<')[0]
-                time = dateLine[4].split('<')[0]
-                dates = dateLine[6].split('<')[0]
+                dateLine = dateLine.split(ClassSearchDelimiters.CLOSE.value)
+                days = dateLine[2].split(ClassSearchDelimiters.OPEN.value)[0]
+                time = dateLine[4].split(ClassSearchDelimiters.OPEN.value)[0]
+                dates = dateLine[6].split(ClassSearchDelimiters.OPEN.value)[0]
             except:
                 dateLine = ""
                 days = ""
@@ -145,12 +151,12 @@ async def quickSearch(searchString):
         
         # Not gurenteed to have a location
             try:
-                location = dateLine[8].split('<')[0]
+                location = dateLine[8].split(ClassSearchDelimiters.OPEN.value)[0]
             except:
                 location = ""
 
         # Need to strip the HTML out of the line storing the professors name as well
-            professor = entity[8].split('>')[1].split('<')[0].strip()
+            professor = entity[8].split(ClassSearchDelimiters.CLOSE.value)[1].split(ClassSearchDelimiters.OPEN.value)[0].strip()
             seats = entity[9]
             waitlist = entity[10]
 
