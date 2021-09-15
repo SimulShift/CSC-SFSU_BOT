@@ -183,6 +183,5 @@ async def class_search_more(ctx, arg):
             message = ''
             break
         sema.release
-
 bot.run(token)
 
