@@ -4,6 +4,7 @@ from os import getenv
 import discord
 from discord.ext.commands import Bot
 from discord import Intents
+from ClassSearch import quickSearch
 
 intents = Intents.all()
 
@@ -32,7 +33,6 @@ print("Loading Bot")
 bot = Bot(intents=intents, command_prefix="!")
 token = getenv("DISCORD_API_TOKEN")
 
-
 async def strike(member):
     db.accounts.update_one(
         {"user_id": member.id}, {"$inc": {f"strikes.{member.guild.id}": 1}}, upsert=True
@@ -44,7 +44,7 @@ async def check_profanity(message):
     # Dont bother checking DM's
     if not message.guild:
         return
-    
+
     # calculate the chance that its a profane string
     profanity_probability = profanity_check.predict_prob([message.content])[0]
     if profanity_probability >= PROF_THRESHOLD:
@@ -52,8 +52,8 @@ async def check_profanity(message):
             # remove the message and explain why
             await message.delete(delay=None)
             await message.author.send(
-            content=f"Hey, I removed the following message because I thought it was profane. \n ```{message.content}```"
-        )
+                content=f"Hey, I removed the following message because I thought it was profane. \n ```{message.content}```"
+            )
         except discord.Forbidden as e:
             print(e, "Please grant the bot manage_messages permission")
         except discord.NotFound as e:
@@ -116,6 +116,7 @@ async def on_message(message):
     # check and handle if the message is profane.
     await check_profanity(message)
 
+
 # check edited messages
 @bot.event
 async def on_message_edit(before, after):
@@ -127,9 +128,47 @@ async def on_message_edit(before, after):
 async def on_disconnect():
     print(f"{bot.user} has been disconnected from discord")
 
+
 @bot.command()
 async def nullptr(ctx):
     await ctx.channel.send("https://i.makeagif.com/media/9-29-2015/YwGqu_.gif")
 
+
+@bot.command()
+async def cs(ctx, arg):
+    await classsearch(ctx, arg)
+
+
+@bot.command()
+async def classsearch(ctx, arg):
+    await ctx.message.delete(delay=1)
+    # Send an inital message here
+    message = await ctx.channel.send(f"Searching for {arg} . . .", delete_after=120)
+
+    # Try to search the database.
+    try:
+        results = await quickSearch(arg)
+    except Exception as e:
+        print(e)
+        await message.edit(content=f"No results for {arg}", delete_after=30)
+        return
+           
+    if len(results) > 15 : 
+        text = "*too many results, printing the first 15 \n```" 
+    else: text = "```"
+
+    for c in results[:15]:
+        # You can modify the lay out of the table by changing the numbers. 
+        # The first number limits the size and the second one pads it with 
+        # spaces to make a nice table
+        text += f'{c["CourseNumber"][:13]:15}'\
+                f'{c["Days"][:10]:12}'\
+                f'{c["Time"][:20]:22}'\
+                f'{c["Professor"][:19]:21}'\
+                f'{c["Dates"][:25]:27}'\
+                f'{c["Location"]}\n'
+
+    text += "```"
+    await message.edit(content=text, delete_after=120)
 
 bot.run(token)
