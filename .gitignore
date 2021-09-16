@@ -3,3 +3,4 @@ env/
 res/token.txt
 .env
 *.swp
+.vscode/
