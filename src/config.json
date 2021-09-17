@@ -1,0 +1,9 @@
+{
+	"prefix": "!",
+	"token": "process.env.DISCORD_API_TOKEN",
+	"words_array" : ["Hi","Bye","This is Array"],
+	"bot_info" : {
+		"name" : "SFSU CSC DISCORD BOT",
+		"version": 1.0
+	}
+}

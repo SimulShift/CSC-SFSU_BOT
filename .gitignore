@@ -4,3 +4,4 @@ res/token.txt
 .env
 *.swp
 .vscode/
+node_modules
