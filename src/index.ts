@@ -12,15 +12,5 @@ import 'dotenv/config' // load .env file
     ],
   })
 
-<<<<<<< Updated upstream
   await bot.login(process.env.DISCORD_API_TOKEN)
-=======
-  bot.once('ready', () => {
-    console.log('Ready!')
-  })
-
-  await bot.login(process.env.DISCORD_API_TOKEN).then(() => {
-    console.log(bot.user?.username + ' has logged in')
-  })
->>>>>>> Stashed changes
 })()
