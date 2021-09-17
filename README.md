@@ -4,7 +4,7 @@
 ### Dependencies
 
 ```
-python -m pip install discord.py python-dotenvpip "pymongo[srv]" alt-profanity-check mechanize beautifulsoup4
+discord.js
 ```
 
 ### Make Bot Here
@@ -17,14 +17,13 @@ https://discord.com/api/oauth2/authorize?client_id=<applicationid>&permissions=8
 
 ### Environment Variables
 
-Create a .env file with the following environment variables
-in the following format `TOKEN=VALUE`
+Create a /secrets/.env.development and a /secrets/.env.production with the following structure
 
-DISCORD\_API\_TOKEN\
-DB\_NAME\
-DB\_PW\
-DB\_URL
+DISCORD_API_TOKEN="MKZABCDEFGHIJKLMNOPQRSTUV"
+DISCORD_GUILD_ID="12341234123412341234"
+DISCORD_CLIENT_ID="1234567643567468"
+
 
 ### Running the bot
 
-To run the program `python3 main.py`
+To run the program `node start`
