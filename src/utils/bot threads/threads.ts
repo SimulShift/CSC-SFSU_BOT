@@ -2,17 +2,20 @@ import { ThreadAutoArchiveDuration } from 'discord-api-types'
 import { Message } from 'discord.js'
 const Discord = require("discord.js")
 export class threads {
-    message:Message
-    constructor(message:Message) {
+    message:Message // must provide a message
+    name:string // must provide a name
+    constructor(message:Message, name:string) {
         this.message = message
+        this.name = name
     }
 
     create() :void {
-        console.log("trying to create a message")
+        // ThreadChannel promise
         this.message.startThread({
-            name : "test",
-            autoArchiveDuration : ThreadAutoArchiveDuration.OneDay
+            name : this.name, // give it the name
+            autoArchiveDuration : ThreadAutoArchiveDuration.OneDay // time until archived
         }).then(() => {
+            // return the ThreadChannel
             return this.message.thread
         })
     }
