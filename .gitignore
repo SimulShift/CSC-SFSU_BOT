@@ -5,3 +5,4 @@ res/token.txt
 *.swp
 .vscode/
 node_modules
+secrets/
