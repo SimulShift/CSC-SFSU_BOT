@@ -4,7 +4,7 @@ let _envPath
 
 switch (process.env.NODE_ENV) {
   case 'production':
-    _envPath = path(`${__dirname}../.env.production`)
+    _envPath = path.resolve(`${__dirname}/../../secrets/.env.production`)
     break
   default:
     _envPath = path.resolve(`${__dirname}/../../secrets/.env.development`)
