@@ -1,5 +1,5 @@
 import { DISCORD_API_TOKEN } from './utils/config'
-import { Client, Intents, Message, TextChannel, ThreadChannelResolvable, ThreadManager, ThreadMemberManager } from 'discord.js'
+import { Client, Intents, Message } from 'discord.js'
 import { commands } from './commands/bot commands/commands';
 
 ;(async () => {
