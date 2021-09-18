@@ -19,6 +19,10 @@ import { commands } from './commands/bot commands/commands';
       if (msg.content == "!nullptr") {
         new commands(msg).nullptr();
       }
+      if (msg.content == "!thread") {
+        console.log("trying to make a message")
+        new commands(msg).muhThread()
+      }
     })
   })
 })()

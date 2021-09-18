@@ -1,19 +1,19 @@
 import { ThreadAutoArchiveDuration } from 'discord-api-types'
-import { Client, Message, Options, ThreadChannel, ThreadManager, ThreadMember, ThreadMemberFlags, ThreadMemberManager } from 'discord.js'
+import { Client, Message } from 'discord.js'
 const Discord = require("discord.js")
-export class commands {
-    //content:string = "https://i.makeagif.com/media/9-29-2015/YwGqu_.gif"
+export class threads {
     message:Message
-    bot:Client
-    constructor(bot:Client, message:Message) {
+    constructor(message:Message) {
         this.message = message
-        this.bot = bot
     }
 
     create() {
+        console.log("trying to create a message")
         this.message.startThread({
             name : "test",
             autoArchiveDuration : ThreadAutoArchiveDuration.OneDay
+        }).then(() => {
+            return this.message.thread
         })
     }
 }
