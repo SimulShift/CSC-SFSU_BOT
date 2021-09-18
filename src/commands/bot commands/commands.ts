@@ -1,4 +1,4 @@
-import { Client, Message } from 'discord.js'
+import { Message } from 'discord.js'
 import { threads } from '../../utils/bot threads/threads'
 
 const Discord = require("discord.js")
