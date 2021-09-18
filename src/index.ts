@@ -15,7 +15,7 @@ import { commands } from './commands/bot commands/commands';
 
   await bot.login(DISCORD_API_TOKEN).then(() => {
     console.log(bot.user?.username + " has connected to discord")
-    bot.on("message", (msg: Message) => {
+    bot.on("onMessage", (msg: Message) => {
       if (msg.content == "!nullptr") {
         new commands(msg).nullptr();
       }
