@@ -11,7 +11,7 @@ export class commands {
     async nullptr() {
         await this.message.reply(this.content)
     }
-    async muhThread() {
+    async thread() {
         await new threads(this.message).create()
     }
 }
