@@ -1,5 +1,6 @@
-import { Client, Intents } from 'discord.js'
 import { DISCORD_API_TOKEN } from './utils/config'
+import { Client, Intents, Message } from 'discord.js'
+import { commands } from './commands/bot commands/commands';
 
 ;(async () => {
   /*Creating a new client */
@@ -14,5 +15,10 @@ import { DISCORD_API_TOKEN } from './utils/config'
 
   await bot.login(DISCORD_API_TOKEN).then(() => {
     console.log(bot.user?.username + " has connected to discord")
+    bot.on("message", (msg: Message) => {
+      if (msg.content == "!nullptr") {
+        new commands(msg).nullptr();
+      }
+    })
   })
 })()
