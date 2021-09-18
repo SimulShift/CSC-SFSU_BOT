@@ -12,6 +12,7 @@ import { commands } from './bot commands/commands';
       Intents.FLAGS.DIRECT_MESSAGES, // To notifiy a user when a message is deleted with an explination.
     ],
   })
+<<<<<<< HEAD
   await bot.login(DISCORD_API_TOKEN).then(() => {
     console.log(bot.user?.username + " has connected to discord")
     bot.on("message", (msg: Message) => {
@@ -19,5 +20,12 @@ import { commands } from './bot commands/commands';
         new commands(msg).nullptr;
       }
     })
+=======
+  await bot.login(process.env.DISCORD_API_TOKEN)
+  bot.on("messageCreate", (msg: Message) => {
+    if (msg.content == "nullptr") {
+      new commands(msg).nullptr();
+    }
+>>>>>>> 07cc602... remove unused import, also remove unused client declaration, also.. actually call the function.. 😅
   })
 })()
