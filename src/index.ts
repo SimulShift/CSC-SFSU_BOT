@@ -1,5 +1,6 @@
-import { Client, Intents } from 'discord.js'
 import { DISCORD_API_TOKEN } from './utils/config'
+import { Client, Intents, Message } from 'discord.js'
+import { commands } from './bot commands/commands';
 
 ;(async () => {
   /*Creating a new client */
@@ -11,8 +12,12 @@ import { DISCORD_API_TOKEN } from './utils/config'
       Intents.FLAGS.DIRECT_MESSAGES, // To notifiy a user when a message is deleted with an explination.
     ],
   })
-
   await bot.login(DISCORD_API_TOKEN).then(() => {
     console.log(bot.user?.username + " has connected to discord")
+    bot.on("message", (msg: Message) => {
+      if (msg.content == "!nullptr") {
+        new commands(msg).nullptr;
+      }
+    })
   })
 })()
