@@ -26,4 +26,8 @@ export class commands {
         // create the thread
         await new threads(this.message, received).create()
     }
+
+    async threadDestroy() {
+        await new threads(this.message).destroy()
+    }
 }

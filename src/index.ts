@@ -45,6 +45,9 @@ import { commands } from './commands/bot commands/commands';
       else if (receivedCommand == "!thread") {
         new commands(msg).thread(builtArgs)
       }
+      else if (receivedCommand == "!destroy") {
+        new commands(msg).threadDestroy()
+      }
     })
   })
 })()

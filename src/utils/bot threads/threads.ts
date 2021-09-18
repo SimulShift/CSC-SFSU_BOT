@@ -4,9 +4,14 @@ const Discord = require("discord.js")
 export class threads {
     message:Message // must provide a message
     name:string // must provide a name
-    constructor(message:Message, name:string) {
+    constructor(message:Message, name?:string | null) {
         this.message = message
-        this.name = name
+        if (name) {
+            this.name = name
+        }
+        else {
+            this.name = this.message.author.username
+        }
     }
 
     create() :void {
@@ -29,17 +34,27 @@ export class threads {
     }
 
     destroy() :void {
+        const messageOwner = this.message.author.id
+        const messageUsername = this.message.author.username
         var thread: ThreadChannel | null
         try {
             thread = this.message.thread
         }
         catch {
             this.message.delete()
+            // this one in particular is temporary logging, will shove this into dictionary later
+            console.log("Rejected impossible thread deletion request from: ",
+             messageOwner, "(", messageUsername, ")")
             return
         }
         if (thread) {
-            if (thread.ownerId == this.message.author.id) {
+            const threadID = thread.id
+            const threadOwner = thread.ownerId
+            console.log(messageOwner, " requested to delete ", threadID)
+            if (threadOwner == messageOwner) {
+                console.log("Request accepted")
                 thread.delete()
+                console.log("Request completed")
             }
         }
     }
