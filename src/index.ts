@@ -12,6 +12,7 @@ import { commands } from './commands/bot commands/commands';
       Intents.FLAGS.DIRECT_MESSAGES, // To notifiy a user when a message is deleted with an explination.
     ],
   })
+
   await bot.login(DISCORD_API_TOKEN).then(() => {
     console.log(bot.user?.username + " has connected to discord")
     bot.on("message", (msg: Message) => {
