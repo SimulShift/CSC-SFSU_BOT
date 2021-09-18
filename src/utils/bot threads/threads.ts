@@ -1,5 +1,5 @@
 import { ThreadAutoArchiveDuration } from 'discord-api-types'
-import { Client, Message } from 'discord.js'
+import { Message } from 'discord.js'
 const Discord = require("discord.js")
 export class threads {
     message:Message
@@ -7,7 +7,7 @@ export class threads {
         this.message = message
     }
 
-    create() {
+    create() :void {
         console.log("trying to create a message")
         this.message.startThread({
             name : "test",
