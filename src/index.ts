@@ -1,5 +1,5 @@
 import { Client, Intents } from 'discord.js'
-import 'dotenv/config' // load .env file
+import { DISCORD_API_TOKEN } from './utils/config'
 
 ;(async () => {
   /*Creating a new client */
@@ -12,5 +12,7 @@ import 'dotenv/config' // load .env file
     ],
   })
 
-  await bot.login(process.env.DISCORD_API_TOKEN)
+  await bot.login(DISCORD_API_TOKEN).then(() => {
+    console.log(bot.user?.username + " has connected to discord")
+  })
 })()
