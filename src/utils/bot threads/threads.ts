@@ -20,13 +20,10 @@ export class threads {
             name : this.name, // give it the name
             autoArchiveDuration : ThreadAutoArchiveDuration.OneDay // time until archived
         }).then(() => {
-            try {
-                if (this.message.thread) {
-                    this.message.thread.ownerId = this.message.author.id
-                }
-            } 
-            catch {
-                console.log("Failed to set owner id:\n", this.message.author.id,"\n")
+            if (this.message.thread) {
+                this.message.thread.ownerId = this.message.author.id
+            } else {
+                console.log("No thread here boss")
             }
             // return the ThreadChannel
             return this.message.thread
@@ -34,28 +31,7 @@ export class threads {
     }
 
     destroy() :void {
-        const messageOwner = this.message.author.id
-        const messageUsername = this.message.author.username
-        var thread: ThreadChannel | null
-        try {
-            thread = this.message.thread
-        }
-        catch {
-            this.message.delete()
-            // this one in particular is temporary logging, will shove this into dictionary later
-            console.log("Rejected impossible thread deletion request from: ",
-             messageOwner, "(", messageUsername, ")")
-            return
-        }
-        if (thread) {
-            const threadID = thread.id
-            const threadOwner = thread.ownerId
-            console.log(messageOwner, " requested to delete ", threadID)
-            if (threadOwner == messageOwner) {
-                console.log("Request accepted")
-                thread.delete()
-                console.log("Request completed")
-            }
-        }
+        console.log("Trying to delete")
+        this.message.channel.delete()
     }
 }
