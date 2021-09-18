@@ -14,6 +14,9 @@ const commands = [
   new SlashCommandBuilder()
     .setName('ProfessorSearch')
     .setDescription('Searches Rate My Professor for a professor.'),
+  new SlashCommandBuilder('nullptr')
+    .setName('nullptr')
+    .setDescription('Produces a nullptr gif as an embedded message response')
 ].map((command) => command.toJSON())
 
 const rest = new REST({ version: '9' }).setToken(token)
