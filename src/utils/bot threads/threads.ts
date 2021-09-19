@@ -63,6 +63,7 @@ export class threads {
                 )
                 console.log(threads.currentThread.toJSON())
                 threads.currentThread.delete()
+                return // ew..
             }
         }
         console.log(
