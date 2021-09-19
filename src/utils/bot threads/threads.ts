@@ -63,6 +63,8 @@ export class threads {
                 )
                 console.log(threads.currentThread.toJSON())
                 threads.currentThread.delete()
+                threads.currentThread = undefined // lol
+                threads.currentThreadOwner = undefined // lol
                 return // ew..
             }
         }
