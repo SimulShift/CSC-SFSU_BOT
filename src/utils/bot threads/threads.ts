@@ -1,9 +1,10 @@
 import { ThreadAutoArchiveDuration } from 'discord-api-types'
-import { Message, ThreadChannel } from 'discord.js'
+import { Message, ThreadChannel, ThreadChannelResolvable } from 'discord.js'
 const Discord = require("discord.js")
 export class threads {
     message:Message // must provide a message
     name:string // must provide a name
+    static thread?:ThreadChannel = undefined
     constructor(message:Message, name?:string | null) {
         this.message = message
         if (name) {
@@ -12,6 +13,10 @@ export class threads {
         else {
             this.name = this.message.author.username
         }
+        if(message.guild) {
+            console.log("guild is:\n", message.guild)
+        }
+        console.log("User ID:\n", message.id)
     }
 
     create() :void {
@@ -21,9 +26,19 @@ export class threads {
             autoArchiveDuration : ThreadAutoArchiveDuration.OneDay // time until archived
         }).then(() => {
             if (this.message.thread) {
-                this.message.thread.ownerId = this.message.author.id
-            } else {
-                console.log("No thread here boss")
+                console.log("Joining thread")
+                this.message.thread.join()
+                console.log
+                (
+                    "Assigned a thread to:\n",
+                    "username:\n",
+                    this.message.author.username,
+                    "\n",
+                    "id:\n",
+                    this.message.id
+                )
+                // store the ThreadChannel for now
+                threads.thread = this.message.thread
             }
             // return the ThreadChannel
             return this.message.thread
@@ -32,6 +47,10 @@ export class threads {
 
     destroy() :void {
         console.log("Trying to delete")
-        this.message.channel.delete()
+        if (threads.thread) {
+            console.log("We have a thread!")
+            console.log(threads.thread.toJSON())
+            threads.thread.delete()
+        }
     }
 }
