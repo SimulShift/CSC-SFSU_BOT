@@ -50,7 +50,6 @@ export class threads {
     destroy() :void {
         if (!this.message.hasThread) {
             this.message.react("😡")
-            return
         }
         const requester = this.message.author.username
         if (threads.currentThread) {
@@ -65,10 +64,10 @@ export class threads {
                 console.log(threads.currentThread.toJSON())
                 threads.currentThread.delete()
             }
-            console.log(
-                "Rejecting the request from:\n",
-                requester
-            )
         }
+        console.log(
+            "Rejecting the request from:\n",
+            requester
+        )
     }
 }
