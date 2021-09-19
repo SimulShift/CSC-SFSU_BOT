@@ -1,5 +1,5 @@
 import { ThreadAutoArchiveDuration } from 'discord-api-types'
-import { Emoji, Message, ThreadChannel } from 'discord.js'
+import { Message, ThreadChannel } from 'discord.js'
 const Discord = require("discord.js")
 export class threads {
     message:Message // must provide a message
