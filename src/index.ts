@@ -1,4 +1,4 @@
-import { DISCORD_API_TOKEN } from './utils/config'
+import { DISCORD_API_TOKEN, client } from './utils/config'
 import { Client, Intents, Message } from 'discord.js'
 import { commands } from './commands/bot commands/commands';
 
@@ -11,6 +11,15 @@ import { commands } from './commands/bot commands/commands';
       Intents.FLAGS.GUILD_MESSAGE_TYPING, // To set the bot to tpying when its loading data from a website.
       Intents.FLAGS.DIRECT_MESSAGES, // To notifiy a user when a message is deleted with an explination.
     ],
+  })
+  
+  await client.connect()
+  const database = client.db('discord')
+  database.listCollections().forEach((thing) => {
+    console.log("collection name:\n", thing.name)
+  })
+  database.collection("accounts").find().forEach((document)=> {
+    console.log("document:\n", document)
   })
 
   await bot.login(DISCORD_API_TOKEN).then(() => {
