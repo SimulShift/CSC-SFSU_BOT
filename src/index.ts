@@ -2,20 +2,6 @@ import { DISCORD_API_TOKEN, client } from './utils/config'
 import { Client, Intents, Message } from 'discord.js'
 import { commands } from './commands/bot commands/commands';
 
-const dotenv = require('dotenv')
-const path = require('path')
-let _envPath
-
-switch (process.env.NODE_ENV) {
-  case 'production':
-    _envPath = path.resolve(`${__dirname}/../../secrets/.env.production`)
-    break
-  default:
-    _envPath = path.resolve(`${__dirname}/../../secrets/.env.development`)
-}
-dotenv.config({ path: _envPath })
-
-
 ;(async () => {
   /*Creating a new client */
   const bot = new Client({
