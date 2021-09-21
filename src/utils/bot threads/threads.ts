@@ -4,8 +4,8 @@ const Discord = require("discord.js")
 export class threads {
     message:Message // must provide a message
     name:string // must provide a name
-    static currentThread?:ThreadChannel = undefined // gross 
-    static currentThreadOwner?:string = undefined // likewise gross
+    static currentThread?:ThreadChannel = undefined // will be replaced with database collection in separate PR
+    static currentThreadOwner?:string = undefined // will be replaced with database collection in separate PR
     constructor(message:Message, name?:string | null) {
         this.message = message
         if (name) {
