@@ -1,8 +1,8 @@
-import { DISCORD_API_TOKEN, client } from './utils/config'
+import { DISCORD_API_TOKEN, db } from './utils/config'
 import { Client, Intents, Message } from 'discord.js'
 import { commands } from './commands/bot commands/commands';
 
-;(async () => {
+module.exports = (async () => {
   /*Creating a new client */
   const bot = new Client({
     intents: [
@@ -12,18 +12,12 @@ import { commands } from './commands/bot commands/commands';
       Intents.FLAGS.DIRECT_MESSAGES, // To notifiy a user when a message is deleted with an explination.
     ],
   })
-  
-  await client.connect()
-  const database = client.db('discord')
-  database.listCollections().forEach((thing) => {
-    console.log("collection name:\n", thing.name)
-  })
-  database.collection("accounts").find().forEach((document)=> {
-    console.log("document:\n", document)
-  })
+  console.log(db.find("something"))
+
 
   await bot.login(DISCORD_API_TOKEN).then(() => {
     console.log(bot.user?.username + " has connected to discord")
+
     bot.on("messageCreate", (msg: Message) :void => {
       // ....
       // gross but gets the job done for the time being (2am, 9/18/2021)
