@@ -1,9 +1,27 @@
 const dotenv = require('dotenv')
 const path = require('path')
+const { guildModel, userModel, threadModel } = require('../database/members/members.model')
 var mongoose = require('mongoose')
 var assert = require('assert')
 
-console.log(path.resolve(`../secrets/.env.development`))
+
+describe('memberModel', () => {
+  let member
+  beforeEach(() =>{
+
+  })
+
+})
+
+describe('threadModel', () =>{
+  let thread
+
+})
+
+describe('guildModel', () =>{
+  let guild
+
+})
 
 describe('MongoDB', () => {
   dotenv.config({ path: path.resolve(`../secrets/.env.development`) })
@@ -11,23 +29,35 @@ describe('MongoDB', () => {
   const _password = process.env.DB_PASSWORD
   const _cluster = process.env.DB_CLUSTER
   const _dbname = process.env.DB_NAME
-  let db
-  beforeEach(() => {
-    db = mongoose.createConnection(
-      `mongodb+srv://${_username}:${_password}@${_cluster}.mongodb.net/${_dbname}?retryWrites=true&w=majority`,
+  beforeEach((done) => {
+    mongoose.connect(
+      `mongodb+srv://${_username}:${_password}@${_cluster}.mongodb.net/test?retryWrites=true&w=majority`,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-      }
-    )
-    db.on('error', console.error.bind(console, 'connection error: '))
-    db.once('open', () => {})
-  })
-  afterEach(() => {
-    db.close()
+      },
+      done
+    )})
+
+  afterEach((done) => {
+    mongoose.connection.close(done)
     mongoose.deleteModel(/.+/)
   })
-  it('connects', () => {
-    assert.ok(db)
+
+  after((done) => {
+    mongoose.connect(
+      `mongodb+srv://${_username}:${_password}@${_cluster}.mongodb.net/test?retryWrites=true&w=majority`,
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      },
+      done //callback to ensure database connects before moving on the test case
+    )
+    mongoose.connection.close()
   })
+
+  it('connects', () => {
+    assert.equal(mongoose.connection.readyState, 1)
+  })
+
 })
