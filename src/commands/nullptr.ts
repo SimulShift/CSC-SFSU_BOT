@@ -8,3 +8,5 @@ module.exports = {
 		return interaction.reply({ content: `https://i.makeagif.com/media/9-29-2015/YwGqu_.gif`});
 	},
 };
+
+export {};
