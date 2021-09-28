@@ -1,12 +1,13 @@
 {
   "name": "sfsu_csc_discord_bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "bot for main discord",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --config nodemon.json index.ts",
     "start": "npx ts-node index.ts",
-    "test": "mocha"
+    "test": "mocha",
+    "deploy-commands": "npx ts-node ./utils/deploy-commands.ts" 
   },
   "author": "",
   "license": "ISC",

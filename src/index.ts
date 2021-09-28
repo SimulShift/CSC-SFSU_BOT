@@ -1,56 +1,44 @@
-import { DISCORD_API_TOKEN, db } from './utils/config'
-import { Client, Intents, Message } from 'discord.js'
-import { commands } from './commands/bot commands/commands';
+import { config } from './utils/config'
+import { Client, Message } from 'discord.js'
+import mongoose from 'mongoose'
 
-module.exports = (async () => {
-  /*Creating a new client */
-  const bot = new Client({
-    intents: [
-      Intents.FLAGS.GUILDS, // Create threads, may
-      Intents.FLAGS.GUILD_MESSAGES, // For reading messages and filiting profanity.
-      Intents.FLAGS.GUILD_MESSAGE_TYPING, // To set the bot to tpying when its loading data from a website.
-      Intents.FLAGS.DIRECT_MESSAGES, // To notifiy a user when a message is deleted with an explination.
-    ],
-  })
-  console.log(db.find("something"))
+const bot = new Client({ intents: config.discord.intents })
 
+bot.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return
 
-  await bot.login(DISCORD_API_TOKEN).then(() => {
-    console.log(bot.user?.username + " has connected to discord")
-
-    bot.on("messageCreate", (msg: Message) :void => {
-      // ....
-      // gross but gets the job done for the time being (2am, 9/18/2021)
-      const receivedArgs: string[] = msg.content.split(" ")
-      var builtArgs:string = ""
-      msg.content.split("").map((arg:string) => {
-        builtArgs += arg
-      })
-
-      // the first element is our command
-      var receivedCommand: any = receivedArgs[0]
-      // log interpreted command
-      console.log("interpreted command:\n", receivedCommand as string, "\n")
-      // log interpreted args
-      console.log("built args:\n", builtArgs, "\n")
-      // remove the command
-      builtArgs = builtArgs.replace(receivedCommand as string, "")
-      // ToDo: bail out if anything sketchy is detected here..
-      //...
-      //gross ends here
-
-      // run the nullptr flow
-      if (receivedCommand == "!nullptr") {
-        new commands(msg).nullptr();
-      }
-
-      // run the thread command
-      else if (receivedCommand == "!thread") {
-        new commands(msg).thread(builtArgs)
-      }
-      else if (receivedCommand == "!destroy") {
-        new commands(msg).threadDestroy()
-      }
+  if (interaction.commandName === 'nullptr') {
+    interaction.reply('https://i.makeagif.com/media/9-29-2015/YwGqu_.gif')
+  } else if (interaction.commandName === 'professorsearch') {
+    interaction.reply({
+      content: `${interaction.commandName} has not been implimented `,
+      ephemeral: true,
     })
+  } else if (interaction.commandName === 'classsearch') {
+    interaction.reply({
+      content: `${interaction.commandName} has not been implimented `,
+      ephemeral: true,
+    })
+  }
+})
+
+// Connect to Database
+mongoose
+  .connect(config.mongo.url, config.mongo.options)
+  .then((result) => {
+    console.log('Connected to MongoDB!')
   })
-})()
+  .catch((error) => {
+    console.error(error)
+  })
+
+// Connect to Discord
+bot
+  .login(config.discord.apiToken)
+  .then(() => {
+    console.log(bot.user?.username + ' has connected to discord')
+  })
+  .catch((error) => {
+    console.error(error)
+  })
+
