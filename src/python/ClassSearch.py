@@ -106,7 +106,7 @@ async def quickSearch(searchString):
             "waitlist":waitlist,
         })
 
-    print(json.dumps(classList))
+    print(json.dumps(classList[:10]))
 
 
 async def main():

@@ -17,6 +17,7 @@ interface Course {
 
 const contentBuilder = (_data: String): String => {
   const results: [Course] = JSON.parse(_data.toString())
+  if (!results[0]) return 'Nothing found'
   let content: String = 'Here\'s what I found'
   for (let c in results) {
     content += '\n'
