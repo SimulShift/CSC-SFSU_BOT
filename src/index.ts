@@ -1,22 +1,32 @@
 import { config } from './utils/config'
-import { Client, Message } from 'discord.js'
+import { Client, Collection, Message } from 'discord.js'
 import mongoose from 'mongoose'
+import fs from 'fs'
 
 const bot = new Client({ intents: config.discord.intents })
 
+const commands = new Collection()
+const commandFiles = fs
+  .readdirSync('./commands')
+  .filter((file) => file.endsWith('.js') || file.endsWith('.ts'))
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`)
+  console.log(`Adding ${command.data.name}`)
+  // Set a new item in the Collection
+  // With the key as the command name and the value as the exported module
+  commands.set(command.data.name, command)
+}
+
 bot.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return
-
-  if (interaction.commandName === 'nullptr') {
-    interaction.reply('https://i.makeagif.com/media/9-29-2015/YwGqu_.gif')
-  } else if (interaction.commandName === 'professorsearch') {
-    interaction.reply({
-      content: `${interaction.commandName} has not been implimented `,
-      ephemeral: true,
-    })
-  } else if (interaction.commandName === 'classsearch') {
-    interaction.reply({
-      content: `${interaction.commandName} has not been implimented `,
+  const commmand: any = commands.get(interaction.commandName)
+  if (!commmand) return
+  try {
+    await commmand.execute(interaction)
+  } catch (error) {
+    await interaction.reply({
+      content: 'There was an error while executing this command!',
       ephemeral: true,
     })
   }
@@ -41,4 +51,3 @@ bot
   .catch((error) => {
     console.error(error)
   })
-

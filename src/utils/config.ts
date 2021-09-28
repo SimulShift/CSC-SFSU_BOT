@@ -2,9 +2,12 @@ import { Intents } from 'discord.js'
 const dotenv = require('dotenv')
 const path = require('path')
 
-// Fallback for windows users
-const ENVIROMENT = process.env.NODE_ENV || 'development'
-
+/*
+  Checks if NODE_ENV is set to production if it is it will load the enviromental variables from
+  .env.production, but for everone else it will load form .env.development. Kind of pointless
+  and confusing in retrospect will probaly simplify in the future
+*/
+const ENVIROMENT = process.env.NODE_ENV || 'development' // fallback for windows users
 dotenv.config({
   path: ((): string => {
     switch (ENVIROMENT) {
@@ -14,13 +17,14 @@ dotenv.config({
       default:
         return path.resolve(`${__dirname}/../../secrets/.env.development`)
     }
-  })(),
+  })()
 })
 
-const MONGO_USERNAME = process.env.DB_USERNAME || 'dbAdmin'
-const MONGO_PASSWORD = process.env.DB_PASSWORD || undefined
-const MONGO_HOST = process.env.DB_HOST || 'discord.0xesk.mongodb.net'
-const MONGO_OPTIONS = {
+// Mongo DB Settings
+const MONGO_USERNAME: string  = process.env.DB_USERNAME || 'dbAdmin'
+const MONGO_PASSWORD: string = process.env.DB_PASSWORD || ''
+const MONGO_HOST: string  = process.env.DB_HOST || 'discord.0xesk.mongodb.net'
+const MONGO_OPTIONS:object = {
   useUnifiedTopology: true,
   useNewUrlParser: true,
   socketTimeoutMS: 30000,
@@ -29,9 +33,10 @@ const MONGO_OPTIONS = {
   retryWrites: false,
 }
 
-const DISCORD_API_TOKEN = process.env.DISCORD_API_TOKEN
-const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID
-const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID
+// Discord application settings
+const DISCORD_API_TOKEN = process.env.DISCORD_API_TOKEN || ''
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || ''
+const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID || ''
 const DISCORD_INTENTS = [
   Intents.FLAGS.GUILDS, // Create threads, may
   Intents.FLAGS.GUILD_MESSAGES, // For reading messages and filiting profanity.

@@ -7,7 +7,7 @@
     "dev": "nodemon --config nodemon.json index.ts",
     "start": "npx ts-node index.ts",
     "test": "mocha",
-    "deploy-commands": "npx ts-node ./utils/deploy-commands.ts" 
+    "deploy-commands": "npx ts-node ./deploy-commands.js" 
   },
   "author": "",
   "license": "ISC",
