@@ -25,14 +25,11 @@ bot.on('interactionCreate', async (interaction) => {
   const commmand: any = commands.get(interaction.commandName)
   if (!commmand) return
   try {
-    console.log(`${interaction.user.username} called ${interaction.commandName}`)
+    console.log(
+      `${interaction.user.username} called ${interaction.commandName}`
+    )
     await commmand.execute(interaction)
-  } catch (error) {
-    await interaction.reply({
-      content: 'There was an error while executing this command!',
-      ephemeral: true,
-    })
-  }
+  } catch (error) {console.error(error)}
 })
 
 // Connect to Database
