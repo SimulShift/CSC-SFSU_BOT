@@ -1,9 +1,8 @@
 import json
 import mechanize
 import asyncio
+import sys
 from bs4 import BeautifulSoup
-
-
 
 async def quickSearch(searchString):
     """
@@ -107,13 +106,14 @@ async def quickSearch(searchString):
             "Waitlist":waitlist,
         })
 
-    return classList
+    return json.dumps(classList)
 
 
 async def main():
-    classes = await quickSearch("210")
-    for c in classes:
-        print(c)
+    classes = await quickSearch(sys.argv[1])
+    classes = json.loads(classes)
+    print(classes)
+
 
 if __name__ == '__main__':
     asyncio.get_event_loop().run_until_complete(main())

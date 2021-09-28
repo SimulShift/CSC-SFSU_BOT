@@ -3,8 +3,10 @@ import { Client, Collection, Message } from 'discord.js'
 import mongoose from 'mongoose'
 import fs from 'fs'
 
+console.log(`Loading Bot`)
 const bot = new Client({ intents: config.discord.intents })
 
+console.log(`Loading commands`)
 const commands = new Collection()
 const commandFiles = fs
   .readdirSync('./commands')
@@ -12,7 +14,7 @@ const commandFiles = fs
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
-  console.log(`Adding ${command.data.name}`)
+  console.log(`  -${command.data.name}`)
   // Set a new item in the Collection
   // With the key as the command name and the value as the exported module
   commands.set(command.data.name, command)
@@ -23,6 +25,7 @@ bot.on('interactionCreate', async (interaction) => {
   const commmand: any = commands.get(interaction.commandName)
   if (!commmand) return
   try {
+    console.log(`${interaction.user.username} called ${interaction.commandName}`)
     await commmand.execute(interaction)
   } catch (error) {
     await interaction.reply({
@@ -36,7 +39,7 @@ bot.on('interactionCreate', async (interaction) => {
 mongoose
   .connect(config.mongo.url, config.mongo.options)
   .then((result) => {
-    console.log('Connected to MongoDB!')
+    console.log('Connected to MongoDB')
   })
   .catch((error) => {
     console.error(error)
