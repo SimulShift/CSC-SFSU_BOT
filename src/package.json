@@ -7,7 +7,7 @@
     "dev": "nodemon --config nodemon.json index.ts",
     "start": "npx ts-node index.ts",
     "test": "mocha",
-    "deploy-commands": "npx ts-node ./deploy-commands.js" 
+    "deploy-commands": "npx ts-node ./deploy-commands.js"
   },
   "author": "",
   "license": "ISC",
@@ -23,7 +23,8 @@
     "@discordjs/rest": "^0.1.0-canary.0",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "mongoose": "^6.0.8"
   },
   "prettier": {
     "semi": false,

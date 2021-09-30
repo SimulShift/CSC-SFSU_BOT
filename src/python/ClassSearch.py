@@ -113,6 +113,5 @@ async def main():
     classes = await quickSearch(sys.argv[1])
 
 
-
 if __name__ == '__main__':
     asyncio.get_event_loop().run_until_complete(main())
