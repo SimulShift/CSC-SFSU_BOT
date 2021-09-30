@@ -17,7 +17,7 @@ const contentBuilder = (_data: String): String => {
   for (let c in results) {
     content += '\n'
     const prof: Professor = results[c]
-    content += `${prof.name} ${prof.department} ${prof.rating} ${prof.wouldtakeagain} ${prof.difficulty}`
+    content += `${prof.name} ${prof.department} ${prof.rating} ${prof.wouldtakeagain} ${prof.rating_count} ${prof.difficulty}`
   }
   return content
 }
