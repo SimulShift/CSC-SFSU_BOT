@@ -29,7 +29,9 @@ bot.on('interactionCreate', async (interaction) => {
       `${interaction.user.username} called ${interaction.commandName}`
     )
     await commmand.execute(interaction)
-  } catch (error) {console.error(error)}
+  } catch (error) {
+    console.error(error)
+  }
 })
 
 // Connect to Database
