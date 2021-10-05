@@ -1,9 +1,8 @@
 import json
 import mechanize
 import asyncio
+import sys
 from bs4 import BeautifulSoup
-
-
 
 async def quickSearch(searchString):
     """
@@ -12,18 +11,18 @@ async def quickSearch(searchString):
     :returns: dicts with the following schema
         [   
             {
-                CourseNumber: "CSC210[1]"
-                Type: "LEC" # Either LEC or LAB I belive
-                Title: "Introduction to Computer Programming"  
-                Units: "3"
-                ClassNumber: "1908"
-                Days: "Tu Th"
-                Time: "12:30PM - 1:45PM"
-                Date: "23-AUG-2021 - 10-DEC-2021"
-                Location: "Online Synchronous" # This field is blank if the class does not have a room assigned yet
-                Instructor: "Arno Puder"
-                Seats: "0"
-                Waitlist "5"
+                coursenumber: "CSC210[1]"
+                type: "LEC" # Either LEC or LAB I belive
+                title: "Introduction to Computer Programming"  
+                units: "3"
+                classnumber: "1908"
+                days: "Tu Th"
+                time: "12:30PM - 1:45PM"
+                date: "23-AUG-2021 - 10-DEC-2021"
+                location: "Online Synchronous" # This field is blank if the class does not have a room assigned yet
+                instructor: "Arno Puder"
+                seats: "0"
+                waitlist: "5"
             }
         ]
     """
@@ -93,27 +92,26 @@ async def quickSearch(searchString):
         waitlist = entity[10]
 
         classList.append({
-            "CourseNumber":courseNumber,                         
-            "Type":type,
-            "Title":title,
-            "Units":units,
-            "ClassNumber":classNumber,
-            "Days":days,
-            "Time":time,
-            "Dates":dates,
-            "Location":location,
-            "Professor":professor,
-            "Seats":seats,
-            "Waitlist":waitlist,
+            "coursenumber":courseNumber,                         
+            "type":type,
+            "title":title,
+            "units":units,
+            "classnumber":classNumber,
+            "days":days,
+            "time":time,
+            "dates":dates,
+            "location":location,
+            "instructor":professor,
+            "seats":seats,
+            "waitlist":waitlist,
         })
 
-    return classList
+    print(json.dumps(classList[:10]))
 
 
 async def main():
-    classes = await quickSearch("210")
-    for c in classes:
-        print(c)
+    classes = await quickSearch(sys.argv[1])
+
 
 if __name__ == '__main__':
     asyncio.get_event_loop().run_until_complete(main())

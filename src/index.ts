@@ -1,62 +1,55 @@
-import { DISCORD_API_TOKEN, client } from './utils/config'
-import { Client, Intents, Message } from 'discord.js'
-import { commands } from './commands/bot commands/commands';
+import { config } from './utils/config'
+import { Client, Collection, Message } from 'discord.js'
+import mongoose from 'mongoose'
+import fs from 'fs'
 
-;(async () => {
-  /*Creating a new client */
-  const bot = new Client({
-    intents: [
-      Intents.FLAGS.GUILDS, // Create threads, may
-      Intents.FLAGS.GUILD_MESSAGES, // For reading messages and filiting profanity.
-      Intents.FLAGS.GUILD_MESSAGE_TYPING, // To set the bot to tpying when its loading data from a website.
-      Intents.FLAGS.DIRECT_MESSAGES, // To notifiy a user when a message is deleted with an explination.
-    ],
+console.log(`Loading Bot`)
+const bot = new Client({ intents: config.discord.intents })
+
+console.log(`Loading commands`)
+const commands = new Collection()
+const commandFiles = fs
+  .readdirSync('./commands')
+  .filter((file) => file.endsWith('.js') || file.endsWith('.ts'))
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`)
+  console.log(`  -${command.data.name}`)
+  // Set a new item in the Collection
+  // With the key as the command name and the value as the exported module
+  commands.set(command.data.name, command)
+}
+
+bot.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return
+  const commmand: any = commands.get(interaction.commandName)
+  if (!commmand) return
+  try {
+    console.log(
+      `${interaction.user.username} called ${interaction.commandName}`
+    )
+    await commmand.execute(interaction)
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+// Connect to Database
+mongoose
+  .connect(config.mongo.url, config.mongo.options)
+  .then((result) => {
+    console.log('Connected to MongoDB')
   })
-  
-  await client.connect()
-  const database = client.db('discord')
-  database.listCollections().forEach((thing) => {
-    console.log("collection name:\n", thing.name)
-  })
-  database.collection("accounts").find().forEach((document)=> {
-    console.log("document:\n", document)
+  .catch((error) => {
+    console.error(error)
   })
 
-  await bot.login(DISCORD_API_TOKEN).then(() => {
-    console.log(bot.user?.username + " has connected to discord")
-    bot.on("messageCreate", (msg: Message) :void => {
-      // ....
-      // gross but gets the job done for the time being (2am, 9/18/2021)
-      const receivedArgs: string[] = msg.content.split(" ")
-      var builtArgs:string = ""
-      msg.content.split("").map((arg:string) => {
-        builtArgs += arg
-      })
-
-      // the first element is our command
-      var receivedCommand: any = receivedArgs[0]
-      // log interpreted command
-      console.log("interpreted command:\n", receivedCommand as string, "\n")
-      // log interpreted args
-      console.log("built args:\n", builtArgs, "\n")
-      // remove the command
-      builtArgs = builtArgs.replace(receivedCommand as string, "")
-      // ToDo: bail out if anything sketchy is detected here..
-      //...
-      //gross ends here
-
-      // run the nullptr flow
-      if (receivedCommand == "!nullptr") {
-        new commands(msg).nullptr();
-      }
-
-      // run the thread command
-      else if (receivedCommand == "!thread") {
-        new commands(msg).thread(builtArgs)
-      }
-      else if (receivedCommand == "!destroy") {
-        new commands(msg).threadDestroy()
-      }
-    })
+// Connect to Discord
+bot
+  .login(config.discord.apiToken)
+  .then(() => {
+    console.log(bot.user?.username + ' has connected to discord')
   })
-})()
+  .catch((error) => {
+    console.error(error)
+  })

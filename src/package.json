@@ -1,17 +1,19 @@
 {
   "name": "sfsu_csc_discord_bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "bot for main discord",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --config nodemon.json index.ts",
     "start": "npx ts-node index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha",
+    "deploy-commands": "npx ts-node ./deploy-commands.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^16.9.2",
+    "mocha": "^9.1.1",
     "nodemon": "^2.0.12",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3"
@@ -21,7 +23,8 @@
     "@discordjs/rest": "^0.1.0-canary.0",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "mongoose": "^6.0.8"
   },
   "prettier": {
     "semi": false,
